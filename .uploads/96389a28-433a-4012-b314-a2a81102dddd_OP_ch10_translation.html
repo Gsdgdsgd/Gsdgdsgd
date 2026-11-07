@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第10章：SDE、微分与矩 — 逐页翻译与难点解释</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1f2329; --muted:#5b6470;
+    --accent:#0e7c66; --accent-soft:#e6f6f1; --orig-bg:#f8f9fb;
+    --trans-bg:#f0fbf3; --explain-bg:#fff8ec; --explain-border:#e8b96b;
+    --code:#d63384; --border:#e4e6eb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .hero{
+    background:linear-gradient(135deg,#0a5d4a 0%,#0e7c66 55%,#16a085 100%);
+    color:#fff; padding:54px 24px 46px; text-align:center;
+  }
+  .hero h1{margin:0 0 10px; font-size:30px; font-weight:700; letter-spacing:.5px}
+  .hero .sub{font-size:16px; opacity:.92}
+  .hero .meta{margin-top:14px; font-size:13px; opacity:.85}
+  .hero .legend{margin-top:18px; display:inline-flex; flex-wrap:wrap; gap:10px; justify-content:center; font-size:12.5px}
+  .legend span{background:rgba(255,255,255,.18); padding:5px 12px; border-radius:14px; backdrop-filter:blur(2px)}
+  .toc{
+    max-width:980px; margin:26px auto 8px; padding:0 18px;
+    columns:3; column-gap:22px; font-size:12.5px;
+  }
+  .toc a{color:var(--accent); text-decoration:none; break-inside:avoid; display:block; padding:2px 0}
+  .toc a:hover{text-decoration:underline}
+  .toc h3{margin:0 0 5px; font-size:13.5px; color:var(--ink); break-after:avoid}
+  .toc .grp{margin-bottom:12px; break-inside:avoid}
+  .wrap{max-width:980px; margin:0 auto; padding:18px 18px 80px}
+  .page-card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:22px 26px 16px; margin-bottom:22px; box-shadow:0 2px 10px rgba(0,0,0,.04);
+    scroll-margin-top:16px;
+  }
+  .page-head{
+    display:flex; align-items:baseline; gap:12px; border-bottom:2px solid var(--accent-soft);
+    padding-bottom:9px; margin-bottom:14px; flex-wrap:wrap;
+  }
+  .page-num{
+    background:var(--accent); color:#fff; font-size:12.5px; font-weight:700;
+    padding:3px 12px; border-radius:20px; flex-shrink:0;
+  }
+  .page-title{font-size:17px; font-weight:650; color:var(--ink); margin:0}
+  .block{margin:12px 0; padding:13px 17px; border-radius:10px; border-left:4px solid var(--border)}
+  .block.orig{background:var(--orig-bg); border-left-color:#9aa7c7}
+  .block.trans{background:var(--trans-bg); border-left-color:#5cb88a}
+  .block.explain{background:var(--explain-bg); border-left-color:var(--explain-border)}
+  .block .tag{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:.5px;
+    color:#fff; padding:2px 9px; border-radius:10px; margin-right:8px; vertical-align:middle;
+  }
+  .block.orig .tag{background:#9aa7c7}
+  .block.trans .tag{background:#5cb88a}
+  .block.explain .tag{background:var(--explain-border)}
+  .block p{margin:7px 0}
+  .block ul{margin:7px 0; padding-left:22px}
+  .block li{margin:4px 0}
+  .eq{display:block; margin:10px 0; padding:5px 4px; text-align:center; overflow-x:auto}
+  mjx-container{font-size:1.02em !important}
+  .divider-card{background:#fff; border:1px dashed #c9d0db; border-radius:14px; padding:14px 22px; margin-bottom:18px; text-align:center; color:var(--muted); font-size:13px}
+  details.summary-box{
+    margin-top:8px; background:#f0f2f8; border-radius:8px; padding:8px 14px;
+    border:1px solid var(--border);
+  }
+  details.summary-box summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:14px}
+  footer{text-align:center; color:var(--muted); font-size:12px; padding:18px}
+  @media (max-width:720px){
+    .toc{columns:1}
+    .page-card{padding:18px 16px 14px}
+    .hero h1{font-size:23px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>第 10 章：SDE、微分与矩</h1>
+  <div class="sub">逐页翻译 · 难点解释</div>
+  <div class="meta">原文：Zhentao Zou · 2026 年 7 月 23 日 · 共 81 页</div>
+  <div class="legend">
+    <span>■ 原文 Original</span>
+    <span>■ 翻译 Translation</span>
+    <span>■ 难点解释 Explanation</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="grp">
+    <h3>10.1 随机过程与 SDE</h3>
+    <a href="#p2">P2 随机过程定义</a>
+    <a href="#p3">P3 平稳性</a>
+    <a href="#p4">P4 布朗运动</a>
+    <a href="#p5">P5 泊松过程</a>
+    <a href="#p6">P6 泊松增量</a>
+    <a href="#p7">P7 SDE 与带漂移布朗</a>
+    <a href="#p9">P9 Itô 过程</a>
+    <a href="#p10">P10 泊松 SDE</a>
+    <a href="#p12">P12 几何泊松</a>
+    <a href="#p13">P13 随机跳跃幅度</a>
+    <a href="#p14">P14 布朗积分</a>
+    <a href="#p15">P15 泊松积分</a>
+  </div>
+  <div class="grp">
+    <h3>10.2 随机微分</h3>
+    <a href="#p16">P16 动机</a>
+    <a href="#p17">P17 确定性链式</a>
+    <a href="#p18">P18 Itô引理(单变量)</a>
+    <a href="#p19">P19 Itô公式</a>
+    <a href="#p20">P20 多变量</a>
+    <a href="#p21">P21 相关性</a>
+    <a href="#p22">P22 两过程</a>
+    <a href="#p23">P23 两过程(续)</a>
+    <a href="#p24">P24 多布朗</a>
+    <a href="#p25">P25 泊松(单)</a>
+    <a href="#p26">P26 泊松独立两过程</a>
+    <a href="#p27">P27 同一泊松</a>
+    <a href="#p28">P28 多泊松过程</a>
+    <a href="#p29">P29 一般 CVF</a>
+    <a href="#p30">P30 布朗+泊松</a>
+  </div>
+  <div class="grp">
+    <h3>10.3 应用</h3>
+    <a href="#p31">P31 期权定价</a>
+    <a href="#p32">P32 期权动态</a>
+    <a href="#p33">P33 组合</a>
+    <a href="#p34">P34 无套利</a>
+    <a href="#p35">P35 Black-Scholes PDE</a>
+    <a href="#p36">P36 预算约束推导</a>
+    <a href="#p37">P37 CVF 应用</a>
+  </div>
+  <div class="grp">
+    <h3>10.4 SDE 解法</h3>
+    <a href="#p38">P38 布朗示例</a>
+    <a href="#p39">P39 TFP 布朗</a>
+    <a href="#p40">P40 几何布朗</a>
+    <a href="#p41">P41 验证</a>
+    <a href="#p42">P42 验证(续)</a>
+    <a href="#p43">P43 期权定价</a>
+    <a href="#p44">P44 BS 公式</a>
+    <a href="#p45">P45 一般线性 SDE</a>
+    <a href="#p46">P46 解的分量</a>
+    <a href="#p47">P47 验证设定</a>
+    <a href="#p48">P48 Itô步骤</a>
+    <a href="#p49">P49 还原原 SDE</a>
+    <a href="#p50">P50 几何泊松 TFP</a>
+    <a href="#p51">P51 解与变量代换</a>
+    <a href="#p52">P52 验证设定</a>
+    <a href="#p53">P53 验证完成</a>
+    <a href="#p54">P54 有限期 IBC</a>
+    <a href="#p55">P55 一般解</a>
+    <a href="#p56">P56 无限期 IBC</a>
+    <a href="#p57">P57 开关过程</a>
+  </div>
+  <div class="grp">
+    <h3>10.5 矩的计算</h3>
+    <a href="#p58">P58 思路</a>
+    <a href="#p60">P60 布朗(一)</a>
+    <a href="#p61">P61 几何布朗 TFP</a>
+    <a href="#p62">P62 期望与方差</a>
+    <a href="#p63">P63 泊松(一)</a>
+    <a href="#p64">P64 泊松(二)</a>
+    <a href="#p66">P66 几何泊松 TFP</a>
+    <a href="#p67">P67 引理 10.5.1</a>
+    <a href="#p68">P68 引理证明</a>
+    <a href="#p69">P69 鞅定义</a>
+    <a href="#p70">P70 布朗鞅</a>
+    <a href="#p71">P71 泊松鞅</a>
+    <a href="#p72">P72 布朗漂移矩</a>
+    <a href="#p73">P73 布朗方差</a>
+    <a href="#p74">P74 多资产期望回报</a>
+    <a href="#p75">P75 泊松期望回报</a>
+    <a href="#p76">P76 泊松(续)</a>
+    <a href="#p77">P77 期望增长率</a>
+    <a href="#p78">P78 均值与方差</a>
+    <a href="#p79">P79 双泊松例</a>
+    <a href="#p80">P80 取期望</a>
+    <a href="#p81">P81 矩方程</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- P1 -->
+<section class="page-card" id="p1">
+  <div class="page-head"><span class="page-num">P1</span><h2 class="page-title">封面</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Chapter 10: SDEs, Differentials and Moments · Zhentao Zou · July 23, 2026</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>第 10 章：随机微分方程（SDE）、微分与矩 · 邹震涛 · 2026 年 7 月 23 日</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>本章主线：</b> 把第 9 章离散时间多期模型"连续化"——用连续时间随机过程（布朗运动、泊松过程）刻画冲击，并发展相应的<b>微积分工具</b>（Itô 引理、变差公式 CVF）来对随机过程函数求微分，最终用来推导资产定价方程、预算约束，并计算随机过程的均值与方差（"矩"）。</p>
+    <p><b>SDE = Stochastic Differential Equation：</b> 形如 $dx(t)=a\,dt+b\,dz(t)$ 的方程，左边是过程的微分，右边含<b>确定性项 $a\,dt$</b>（漂移）与<b>随机项 $b\,dz(t)$</b>（扩散/跳跃）。它是连续时间版的状态转移方程。</p>
+  </div>
+</section>
+
+<!-- P2 -->
+<section class="page-card" id="p2">
+  <div class="page-head"><span class="page-num">P2</span><h2 class="page-title">10.1.1 随机过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Definition 10.1.1</b> A stochastic process is a parameterized collection of random variables $\{X(t)\}_{t\in[t_0,T]}$.</p>
+    <ul>
+      <li>A random variable gives one realization when observed once.</li>
+      <li>A stochastic process gives a time-indexed sequence of random variables.</li>
+    </ul>
+    <div class="eq">$$ Z(t)\sim N(\mu,\sigma^2 t)\;\Rightarrow\; f(z)=\frac{1}{\sqrt{2\pi\sigma^2 t}}\exp\!\left(-\frac{1}{2}\frac{(z-\mu)^2}{\sigma^2 t}\right) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>定义 10.1.1</b> 随机过程是一族带参数的随机变量 $\{X(t)\}_{t\in[t_0,T]}$。</p>
+    <ul>
+      <li>随机变量观测一次给出一个"实现值"。</li>
+      <li>随机过程给出一列以时间为下标的随机变量。</li>
+    </ul>
+    <div class="eq">$$ Z(t)\sim N(\mu,\sigma^2 t)\;\Rightarrow\; f(z)=\frac{1}{\sqrt{2\pi\sigma^2 t}}\exp\!\left(-\frac{(z-\mu)^2}{2\sigma^2 t}\right) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>随机变量 vs 随机过程：</b> 随机变量是"一次抽签"；随机过程是"每个时间点都抽一次签"，且不同时点的抽签可有依赖关系（如马尔可夫性）。可以理解成<b>把"时间"作为参数的随机变量族</b>。</p>
+    <p><b>$Z(t)\sim N(\mu,\sigma^2 t)$ 的意义：</b> 在每个 $t$，$Z(t)$ 都是正态分布，但<b>方差随时间线性增长</b>（$\sigma^2 t$）。这说明"时间越长，不确定性越大"。当 $t=0$ 时方差为 0，过程值确定。这是布朗运动的核心性质之一。</p>
+    <p><b>参数 $\mu,\sigma$：</b> $\mu$ 是漂移（drift），决定平均走向；$\sigma$ 是扩散系数（volatility），决定噪声大小。</p>
+  </div>
+</section>
+
+<!-- P3 -->
+<section class="page-card" id="p3">
+  <div class="page-head"><span class="page-num">P3</span><h2 class="page-title">10.1.1 随机过程：平稳性</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Definition 10.1.2</b> $X(t)$ is stationary if $X(t_1),\ldots,X(t_n)$ and $X(t_1+s),\ldots,X(t_n+s)$ have the same joint distribution for all $n$ and $s$.</p>
+    <p><b>Definition 10.1.3</b> $X(t)$ is weakly stationary if $\mathbb{E}_0 X(t)=\mu$, $\text{Var}\,X(t)=\sigma^2$, $\text{Cov}(X(t_2),X(t_1))=f(t_2-t_1)$, where $\mu,\sigma^2$ are constants.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>定义 10.1.2 (严平稳)</b> 若对任意 $n$ 和 $s$，$(X(t_1),\ldots,X(t_n))$ 与 $(X(t_1+s),\ldots,X(t_n+s))$ 同分布，则 $X(t)$ 平稳。</p>
+    <p><b>定义 10.1.3 (弱平稳)</b> 若 $\mathbb{E}_0 X(t)=\mu$、$\text{Var}\,X(t)=\sigma^2$、$\text{Cov}(X(t_2),X(t_1))=f(t_2-t_1)$，其中 $\mu,\sigma^2$ 为常数，则 $X(t)$ 弱平稳。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"严"vs"弱"：</b> 严平稳要求<b>整个联合分布</b>时间平移不变；弱平稳只要求<b>前二阶矩</b>（均值、方差、协方差）时间平移不变。弱平稳是严平稳的弱化版，更易检验。</p>
+    <p><b>协方差只依赖时间差 $t_2-t_1$：</b> 这是平稳性的关键特征——"两点相关程度"只看间隔，不看绝对位置。这保证统计性质不随时间漂移。</p>
+    <p><b>为什么布朗运动非平稳：</b> 因为 $\text{Var}\,z(t)=\sigma^2 t$ 随 $t$ 增长，不满足"方差为常数"的弱平稳条件。这是下一页要强调的结论。</p>
+  </div>
+</section>
+
+<!-- P4 -->
+<section class="page-card" id="p4">
+  <div class="page-head"><span class="page-num">P4</span><h2 class="page-title">10.1.1 随机过程：布朗运动</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Definition 10.1.5</b> A stochastic process $z(t)$ is a Brownian motion if:</p>
+    <ul>
+      <li>$z(0)=0$;</li>
+      <li>it has stationary independent increments;</li>
+      <li>for every $t>0$, $z(t)$ is normally distributed with mean 0 and variance $\sigma^2 t$.</li>
+    </ul>
+    <p>Independent increments imply the Markov property. The variance grows linearly in time, so Brownian motion is non-stationary.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>定义 10.1.5</b> 过程 $z(t)$ 是布朗运动，若：</p>
+    <ul>
+      <li>$z(0)=0$；</li>
+      <li>具有平稳独立增量；</li>
+      <li>对每个 $t>0$，$z(t)$ 服从正态分布，均值 0、方差 $\sigma^2 t$。</li>
+    </ul>
+    <p>独立增量蕴含马尔可夫性。方差随时间线性增长，故布朗运动非平稳。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>三大核心性质：</b></p>
+    <ul>
+      <li><b>初始为 0：</b> 布朗运动从原点出发，便于分析增量。</li>
+      <li><b>独立增量：</b> 不重叠时段的增量相互独立——"过去不告诉你未来的增量"。这蕴含<b>马尔可夫性</b>（未来只依赖当前状态，不依赖更远历史）。</li>
+      <li><b>正态分布：</b> 增量 $z(\tau)-z(t)\sim N(0,\sigma^2(\tau-t))$，方差与时间长度成正比。</li>
+    </ul>
+    <p><b>"平稳独立增量"两个词：</b> 独立是"互不影响"；平稳是"增量分布只依赖时间长度、不依赖起点"。两者结合保证 $z(\tau)-z(t)\sim N(0,\sigma^2(\tau-t))$ 与 $t$ 无关。</p>
+    <p><b>非平稳：</b> 因 $\text{Var}\,z(t)=\sigma^2 t\to\infty$，方差随时间发散，违反弱平稳的"方差为常数"。所以布朗运动本身不是平稳过程，但其<b>增量</b>是平稳的。</p>
+  </div>
+</section>
+
+<!-- P5 -->
+<section class="page-card" id="p5">
+  <div class="page-head"><span class="page-num">P5</span><h2 class="page-title">10.1.1 随机过程：泊松过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Definition 10.1.6</b> $q(t)$ is a Poisson process with arrival rate $\lambda$ if:</p>
+    <ul>
+      <li>$q(0)=0$;</li>
+      <li>it has independent increments;</li>
+      <li>$q(\tau)-q(t)\sim\text{Poisson}(\lambda[\tau-t])$.</li>
+    </ul>
+    <div class="eq">$$ P[q(\tau)-q(t)=n]=e^{-\lambda[\tau-t]}\frac{(\lambda[\tau-t])^n}{n!},\quad n=0,1,\ldots \quad (10.1.1) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>定义 10.1.6</b> $q(t)$ 是到达率（arrival rate）为 $\lambda$ 的泊松过程，若：</p>
+    <ul>
+      <li>$q(0)=0$；</li>
+      <li>具有独立增量；</li>
+      <li>$q(\tau)-q(t)\sim\text{Poisson}(\lambda[\tau-t])$。</li>
+    </ul>
+    <div class="eq">$$ P[q(\tau)-q(t)=n]=e^{-\lambda[\tau-t]}\frac{(\lambda[\tau-t])^n}{n!},\quad n=0,1,\ldots \quad (10.1.1) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>泊松过程的经济含义：</b> $q(t)$ 计数到时刻 $t$ 为止发生的<b>事件次数</b>（如危机次数、技术突破次数）。到达率 $\lambda$ 表示"单位时间内平均发生 $\lambda$ 次"。</p>
+    <p><b>布朗 vs 泊松：</b> 布朗运动刻画<b>连续小冲击</b>（如高频噪声），增量正态、连续路径；泊松过程刻画<b>稀疏大冲击</b>（如危机、跳跃），增量取非负整数、路径是阶梯函数（不连续）。两者是连续时间随机过程的两大基石。</p>
+    <p><b>泊松分布 $P(n)$：</b> 均值 = 方差 = $\lambda(\tau-t)$，是泊松分布的标志性性质。$n=0$（无事件）概率 $e^{-\lambda(\tau-t)}$ 随时间衰减，但永远不为零。</p>
+  </div>
+</section>
+
+<!-- P6 -->
+<section class="page-card" id="p6">
+  <div class="page-head"><span class="page-num">P6</span><h2 class="page-title">10.1.1 随机过程：泊松增量</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Over a small time interval, the increment is written as $dq(t)$. The usual "arrival rate" representation is the small-$dt$ approximation.</p>
+    <div class="eq">$$ dq(t)=\begin{cases}0, & \text{with probability }1-\lambda dt,\\ 1, & \text{with probability }\lambda dt,\end{cases}\quad (10.1.2) $$</div>
+    <div class="eq">$$ P[dq(t)=1]\simeq\lambda dt,\quad P[dq(t)=0]\simeq 1-\lambda dt. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>在小时段内，增量记为 $dq(t)$。常用"到达率"形式是小 $dt$ 近似：</p>
+    <div class="eq">$$ dq(t)=\begin{cases}0, & \text{概率 }1-\lambda dt,\\ 1, & \text{概率 }\lambda dt,\end{cases}\quad (10.1.2) $$</div>
+    <div class="eq">$$ P[dq(t)=1]\simeq\lambda dt,\;\; P[dq(t)=0]\simeq 1-\lambda dt. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$dq(t)$ 只取 0 或 1：</b> 在无穷小时段 $dt$ 内，至多发生一次跳跃（多次跳跃概率为 $O(dt^2)$ 可忽略）。$dq=1$ 表示"跳了一次"，$dq=0$ 表示"没跳"。</p>
+    <p><b>$\simeq$ 不是 $=$：</b> 精确地说，$P(\text{至少一次跳跃})=1-e^{-\lambda dt}=\lambda dt+O(dt^2)$，一阶近似即 $\lambda dt$。在 SDE 演算中只用一阶项，所以可写 $\simeq$。</p>
+    <p><b>$dq$ 与 $dz$ 的区别：</b> $dz\sim N(0,dt)$ 是连续的、大小为 $\sqrt{dt}$ 量级；$dq$ 是离散的、取值 0/1。这决定了它们的"二次变差"不同（$dz^2=dt$，$dq^2=dq$），进而影响 Itô 公式与 CVF 的形式。</p>
+  </div>
+</section>
+
+<!-- P7 -->
+<section class="page-card" id="p7">
+  <div class="page-head"><span class="page-num">P7</span><h2 class="page-title">10.1.2 随机微分方程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>The standard Brownian normalization used below is $\mathbb{E}_t[z(\tau)-z(t)]=0$, $\text{Var}_t[z(\tau)-z(t)]=\tau-t$.</p>
+    <p>SDEs combine deterministic $dt$ terms and stochastic increment terms.</p>
+    <div class="eq">$$ dx(t)=a\,dt+b\,dz(t). \quad (10.1.3) $$</div>
+    <div class="eq">$$ \dot y(t)=a,\quad y(t)=y_0+at. \quad (10.1.4) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>下面使用标准布朗归一化：$\mathbb{E}_t[z(\tau)-z(t)]=0$，$\text{Var}_t[z(\tau)-z(t)]=\tau-t$。</p>
+    <p>SDE 由确定性 $dt$ 项与随机增量项组合而成。</p>
+    <div class="eq">$$ dx(t)=a\,dt+b\,dz(t). \quad (10.1.3) $$</div>
+    <div class="eq">$$ \dot y(t)=a,\;\; y(t)=y_0+at. \quad (10.1.4) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"标准布朗归一化"：</b> 取 $\sigma=1$，即单位时间方差为 1。这样记号简洁，且 $b$ 已包含全部"波动率"信息。要恢复一般 $\sigma$，只需把 $b$ 替换为 $b\sigma$。</p>
+    <p><b>(10.1.3) 各项意义：</b> $a\,dt$ 是<b>漂移项</b>（deterministic drift），$b\,dz(t)$ 是<b>扩散项</b>（diffusion）。$a$ 是"平均速率"，$b$ 是"波动率乘子"。</p>
+    <p><b>(10.1.4) 是确定性对应物：</b> 若 $b=0$（无噪声），SDE 退化为 ODE $\dot y=a$，解为 $y(t)=y_0+at$。这是教学上"先看确定性、再加噪声"的标准做法。</p>
+    <p><b>直觉：</b> 把 SDE 想象成"以 $a$ 为平均速度、但每瞬间被 $dz$ 随机扰动"的运动。短期看像随机游走，长期看像趋势 $a$。</p>
+  </div>
+</section>
+
+<div class="divider-card">P8 是空白分隔页（仅页码 8/81）</div>
+
+<!-- P9 -->
+<section class="page-card" id="p9">
+  <div class="page-head"><span class="page-num">P9</span><h2 class="page-title">10.1.2 SDE：Itô 过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A generalized Brownian motion lets drift and variance depend on states and time. $a(\cdot)$ is the drift rate and $b^2(\cdot)$ is the instantaneous variance rate.</p>
+    <div class="eq">$$ dx(t)=a(x(t),z(t),t)\,dt+b(x(t),z(t),t)\,dz(t). \quad (10.1.5) $$</div>
+    <p>In economic applications, $z(t)$ can represent an aggregate fundamental shock.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>广义布朗运动允许漂移与方差依赖于状态和时间。$a(\cdot)$ 是漂移率，$b^2(\cdot)$ 是瞬时方差率。</p>
+    <div class="eq">$$ dx(t)=a(x(t),z(t),t)\,dt+b(x(t),z(t),t)\,dz(t). \quad (10.1.5) $$</div>
+    <p>在经济应用中，$z(t)$ 可表示加总基本面冲击。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>Itô 过程 = 状态依赖的 SDE：</b> (10.1.3) 是常系数特例；这里 $a,b$ 可依赖 $x,z,t$，能刻画非线性、状态依赖的动态。这是宏观金融建模的标准框架。</p>
+    <p><b>$b^2$ 而非 $b$ 作为"方差率"：</b> 因 $dz$ 的方差是 $dt$，故 $b\,dz$ 的方差是 $b^2 dt$。所以 $b^2(\cdot)$ 才是"单位时间方差率"，$b$ 是其平方根（波动率）。</p>
+    <p><b>"加总基本面冲击" $z(t)$：</b> 例如全经济范围内的技术冲击、货币政策冲击。把它作为公共驱动源，多个变量可共享 $z(t)$ 体现相关性——这是后续 10.2.2 讨论相关布朗的伏笔。</p>
+  </div>
+</section>
+
+<!-- P10 -->
+<section class="page-card" id="p10">
+  <div class="page-head"><span class="page-num">P10</span><h2 class="page-title">10.1.2 SDE：泊松过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A simple Poisson-driven SDE is</p>
+    <div class="eq">$$ dx(t)=a\,dt+b\,dq(t). \quad (10.1.6) $$</div>
+    <p>If no jump occurs, $dq=0$ and $x(t)$ follows $dx=a\,dt$. If a jump occurs, $dq=1$ and the post-jump value satisfies</p>
+    <div class="eq">$$ \tilde x(t)-x(t)=b,\quad \tilde x(t)=x(t)+b. \quad (10.1.7) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>一个简单的泊松驱动 SDE 是</p>
+    <div class="eq">$$ dx(t)=a\,dt+b\,dq(t). \quad (10.1.6) $$</div>
+    <p>若不跳跃，$dq=0$，$x(t)$ 满足 $dx=a\,dt$。若跳跃，$dq=1$，跳后值满足</p>
+    <div class="eq">$$ \tilde x(t)-x(t)=b,\quad \tilde x(t)=x(t)+b. \quad (10.1.7) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>路径形态：</b> 在跳跃之间，$x(t)$ 以速率 $a$ 线性漂移；跳跃发生时，$x$ 瞬时增加 $b$。整体路径是"线性趋势 + 阶梯跳跃"。</p>
+    <p><b>$\tilde x$ 记号：</b> 表示跳跃后的"新值"。因 $dq=1$ 时刻 $x$ 不连续，故需区分"跳前" $x(t)$ 与"跳后" $\tilde x(t)$。这对后续 CVF 推导至关重要——泊松微积分中跳跃项是 $\{F(\text{跳后})-F(\text{跳前})\}dq$。</p>
+    <p><b>对比布朗 SDE：</b> 布朗 $dz$ 让 $x$ 每个时刻都在抖动（路径连续但不可导）；泊松 $dq$ 让 $x$ 在离散时点跳跃（路径阶梯状、不连续）。两者代表"连续噪声"与"跳跃噪声"两大类。</p>
+  </div>
+</section>
+
+<div class="divider-card">P11 是空白分隔页（仅页码 11/81）</div>
+
+<!-- P12 -->
+<section class="page-card" id="p12">
+  <div class="page-head"><span class="page-num">P12</span><h2 class="page-title">10.1.2 SDE：几何泊松</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A process is called geometric when it describes a rate of change. For Poisson uncertainty, the drift $a(\cdot)$ is not the average growth rate.</p>
+    <div class="eq">$$ dx(t)=a(q(t),t)\,x(t)\,dt+b(q(t),t)\,x(t)\,dq(t). \quad (10.1.8) $$</div>
+    <p>The variable grows deterministically at rate $a(\cdot)$ and jumps by $b(\cdot)$ percent when $q(t)$ jumps.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>当过程描述的是变化率时，称为"几何"过程。在泊松不确定性下，漂移 $a(\cdot)$ 并非平均增长率。</p>
+    <div class="eq">$$ dx(t)=a(q(t),t)\,x(t)\,dt+b(q(t),t)\,x(t)\,dq(t). \quad (10.1.8) $$</div>
+    <p>变量以速率 $a(\cdot)$ 确定性增长；当 $q(t)$ 跳跃时，按 $b(\cdot)$ 比例跳变。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"几何"的含义：</b> $dx/x$ 是百分比变化率。"几何过程"指 SDE 写成 $dx/x=\cdots$ 形式，描述<b>增长率</b>而非绝对增量。这保证过程取正值（如资产价、TFP），符合金融与宏观惯例。</p>
+    <p><b>"漂移 $a$ 不是平均增长率"——重要警告：</b> 在泊松情形，跳跃按 $b$ 比例发生、到达率 $\lambda$，故期望意义下的<b>额外平均增长率</b>是 $\lambda b$（每期平均跳 $\lambda$ 次、每次贡献 $b$）。所以<b>期望增长率 = $a+\lambda b$</b>，不是 $a$。这是与确定性增长 $\dot x/x=a$ 的关键差别。后面 10.5 会反复用到这一校正。</p>
+    <p><b>对比几何布朗：</b> 几何布朗 $dx/x=a\,dt+\sigma\,dz$ 的期望增长率是 $a$（因 $\mathbb{E}dz=0$）；但若写成 $d\ln x$ 形式会有 $-\frac{1}{2}\sigma^2$ 的 Itô 修正，这也是后面要解释的 Itô 校正。</p>
+  </div>
+</section>
+
+<!-- P13 -->
+<section class="page-card" id="p13">
+  <div class="page-head"><span class="page-num">P13</span><h2 class="page-title">10.1.2 SDE：随机跳跃幅度</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Jump amplitudes can themselves be random. For TFP $A(t)$, a jump changes $A(t)$ by the realized percentage $b(t)$.</p>
+    <div class="eq">$$ dA(t)=b(t)A(t)\,dq(t),\quad b(t)\sim(\mu,\sigma^2). \quad (10.1.9) $$</div>
+    <div class="eq">$$ dA(t)\equiv\tilde A(t)-A(t)=b(t)A(t),\quad \tilde A(t)=(1+b(t))A(t) $$</div>
+    <p>for all $t$ where $q(t)$ jumps.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>跳跃幅度本身可以是随机的。对 TFP $A(t)$，跳跃按实现值 $b(t)$ 的百分比改变 $A(t)$。</p>
+    <div class="eq">$$ dA(t)=b(t)A(t)\,dq(t),\quad b(t)\sim(\mu,\sigma^2). \quad (10.1.9) $$</div>
+    <div class="eq">$$ \tilde A(t)=(1+b(t))A(t)\quad \text{（在 }q(t)\text{ 跳跃的时点）} $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>双重随机：</b> 此处有<b>两层</b>随机性：跳跃<b>时间</b>由 $q(t)$ 决定（泊松），跳跃<b>幅度</b>由 $b(t)$ 决定（一般分布）。这是更一般的跳跃-扩散模型（如 Merton 模型）。</p>
+    <p><b>$\tilde A=(1+b)A$：</b> 跳跃后新值 = 旧值乘以 $(1+b)$。若 $b>0$ 是正向跳跃（如技术进步），$b<0$ 是负向跳跃（如危机）。</p>
+    <p><b>$b(t)\sim(\mu,\sigma^2)$ 记号：</b> 表示 $b(t)$ 的分布均值为 $\mu$、方差为 $\sigma^2$，但不一定是正态。可取对数正态保证 $1+b>0$（避免 TFP 变负）。</p>
+  </div>
+</section>
+
+<!-- P14 -->
+<section class="page-card" id="p14">
+  <div class="page-head"><span class="page-num">P14</span><h2 class="page-title">10.1.3 积分表示：布朗运动</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Integral representations are used frequently for computing moments. Rewrite the SDE with integration variable $s$ and integrate from $t$ to $\tau$.</p>
+    <div class="eq">$$ x(\tau)-x(t)=\int_t^\tau a(x,s)\,ds+\int_t^\tau b(x,s)\,dz(s). \quad (10.1.10) $$</div>
+    <div class="eq">$$ d\!\left[\int_t^\tau a\,ds+\int_t^\tau b\,dz\right]=dx(\tau)=a(x,\tau)\,d\tau+b(x,\tau)\,dz(\tau). $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>积分表示常用于计算矩。把 SDE 用积分变量 $s$ 重写，从 $t$ 积到 $\tau$：</p>
+    <div class="eq">$$ x(\tau)-x(t)=\int_t^\tau a(x,s)\,ds+\int_t^\tau b(x,s)\,dz(s). \quad (10.1.10) $$</div>
+    <div class="eq">$$ d\!\left[\int_t^\tau a\,ds+\int_t^\tau b\,dz\right]=a(x,\tau)\,d\tau+b(x,\tau)\,dz(\tau). $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>SDE ⇔ 随机积分：</b> SDE 是"微分形式"，等号两边从 $t$ 到 $\tau$ 积分得"积分形式"。两种表示等价，但积分形式便于取期望——因为 $\mathbb{E}_t\int b\,dz=0$（Itô 积分是鞅）。</p>
+    <p><b>两个积分的区别：</b> $\int a\,ds$ 是普通黎曼积分（确定性被积函数时）；$\int b\,dz$ 是<b>Itô 随机积分</b>。后者不是普通积分——$dz$ 不可导、路径不光滑，需要专门定义。但取条件期望时，$\mathbb{E}_t\int b\,dz=0$ 这一性质极有用。</p>
+    <p><b>为什么用积分表示算矩：</b> 矩（均值、方差）本质是期望，而期望对"积分"友好（线性）。故先把 SDE 写成积分形式，再取期望，即可得到矩的微分方程（见 10.5）。</p>
+  </div>
+</section>
+
+<!-- P15 -->
+<section class="page-card" id="p15">
+  <div class="page-head"><span class="page-num">P15</span><h2 class="page-title">10.1.3 积分表示：泊松过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Start from the generalized Poisson-driven SDE $dx(s)=a(x(s),q(s))\,ds+b(x(s),q(s))\,dq(s)$. Applying $\int_t^\tau$ gives</p>
+    <div class="eq">$$ x(\tau)-x(t)=\int_t^\tau a(x(s),q(s))\,ds+\int_t^\tau b(x(s),q(s))\,dq(s). $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>从广义泊松 SDE $dx(s)=a(x(s),q(s))\,ds+b(x(s),q(s))\,dq(s)$ 出发，两端取 $\int_t^\tau$ 得</p>
+    <div class="eq">$$ x(\tau)-x(t)=\int_t^\tau a(x(s),q(s))\,ds+\int_t^\tau b(x(s),q(s))\,dq(s). $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>泊松随机积分 $\int b\,dq$：</b> 因 $dq$ 只在跳跃点非零，这其实是<b>跳幅求和</b>：$\int_t^\tau b\,dq=\sum_{\text{jump}} b(\text{跳时状态})$。这与 Itô 积分完全不同，但仍保持"取期望后等价于 $\lambda\int b\,ds$"的便利性质（后面 10.5 会用）。</p>
+    <p><b>对 $a$ 的积分项：</b> 与布朗情形相同，是普通黎曼积分，表示"漂移贡献的累积"。</p>
+    <p><b>结构对照：</b> 布朗积分有"$\int b\,dz$ 鞅 → 期望为 0"；泊松积分有"$\int b\,dq-\lambda\int b\,ds$ 鞅"（补偿泊松鞅）。两者在 10.5 的矩计算中都扮演核心角色。</p>
+  </div>
+</section>
+
+<!-- P16 -->
+<section class="page-card" id="p16">
+  <div class="page-head"><span class="page-num">P16</span><h2 class="page-title">10.2.1 为什么要这些？</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>The goal is to compute differentials of functions of stochastic processes.</p>
+    <p>The deterministic analogue starts from $Y(A(t),K(t),L)$.</p>
+    <div class="eq">$$ \frac{d}{dt}Y(A(t),K(t),L)=Y_A\frac{dA(t)}{dt}+Y_K\frac{dK(t)}{dt}+Y_L\frac{dL}{dt}. $$</div>
+    <div class="eq">$$ dY(A(t),K(t),L)=Y_A\,dA(t)+Y_K\,dK(t)+Y_L\,dL. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>目标：对随机过程的函数求微分。</p>
+    <p>确定性对应物从 $Y(A(t),K(t),L)$ 出发。</p>
+    <div class="eq">$$ \frac{d}{dt}Y(A(t),K(t),L)=Y_A\frac{dA(t)}{dt}+Y_K\frac{dK(t)}{dt}+Y_L\frac{dL}{dt}. $$</div>
+    <div class="eq">$$ dY=Y_A\,dA+Y_K\,dK+Y_L\,dL. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>动机：</b> 宏观模型中产出 $Y$ 是 $A,K,L$ 的函数（如 $Y=AK^\alpha L^{1-\alpha}$）。当 $A$（TFP）、$K$（资本）服从 SDE 时，需要知道 $Y$ 本身服从什么 SDE。这就要<b>对随机过程函数求微分</b>。</p>
+    <p><b>确定性情形：普通链式法则。</b> $dY=Y_A\,dA+Y_K\,dK+Y_L\,dL$。这只用一阶偏导，因为二阶项 $dA^2$ 在普通微积分中是高阶无穷小，可忽略。</p>
+    <p><b>随机情形的关键挑战：</b> 对布朗运动，$(dz)^2=dt$ 不是高阶无穷小，所以二阶项必须保留——这就是 Itô 引理与普通链式法则的根本差别。下一页先看确定性版铺垫，再随机化。</p>
+  </div>
+</section>
+
+<!-- P17 -->
+<section class="page-card" id="p17">
+  <div class="page-head"><span class="page-num">P17</span><h2 class="page-title">10.2.1 为什么要这些？：确定性链式</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Insert the ODEs for TFP and capital accumulation.</p>
+    <div class="eq">$$ \dot K(t)=I(t)-\delta K(t),\quad \frac{\dot A(t)}{A(t)}=g. $$</div>
+    <div class="eq">$$ dY(A(t),K(t),L)=Y_A\,gA(t)\,dt+Y_K[I(t)-\delta K(t)]\,dt+0. $$</div>
+    <p>The stochastic sections provide the corresponding rules when $A(t)$ or $K(t)$ follow SDEs.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>代入 TFP 与资本积累的 ODE。</p>
+    <div class="eq">$$ \dot K(t)=I(t)-\delta K(t),\quad \dot A(t)/A(t)=g. $$</div>
+    <div class="eq">$$ dY=Y_A\,gA(t)\,dt+Y_K[I(t)-\delta K(t)]\,dt+0. $$</div>
+    <p>下面随机小节给出 $A(t)$、$K(t)$ 服从 SDE 时的对应规则。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>确定性代入：</b> 由 $\dot A=gA$，$dA=gA\,dt$；由 $\dot K=I-\delta K$，$dK=(I-\delta K)\,dt$。代入 $dY=Y_A\,dA+Y_K\,dK+Y_L\,dL$ 即得。$dL=0$ 因假设劳动 $L$ 暂时固定。</p>
+    <p><b>结果意义：</b> 产出的微分 = TFP 贡献 $Y_A g A\,dt$ + 资本贡献 $Y_K(I-\delta K)\,dt$。这给出产出的演化方程，是宏观动态的核心。</p>
+    <p><b>铺垫作用：</b> 当 $A$ 服从 SDE（如 $dA/A=g\,dt+\sigma\,dz$），需要把 $dA$ 换成 SDE 形式，再用<b>Itô 引理</b>处理 $(dA)^2$ 项。下一节正式介绍这些规则。</p>
+  </div>
+</section>
+
+<!-- P18 -->
+<section class="page-card" id="p18">
+  <div class="page-head"><span class="page-num">P18</span><h2 class="page-title">10.2.2 布朗微分：单过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.1</b> Let $F(t,x)$ be twice differentiable in $x$ and once in $t$, and let $dx(t)=a(x(t),z(t),t)\,dt+b(x(t),z(t),t)\,dz(t)$. Then</p>
+    <div class="eq">$$ dF=F_t\,dt+F_x\,dx+\tfrac{1}{2}F_{xx}(dx)^2. \quad (10.2.1) $$</div>
+    <div class="eq">$$ dt\,dt=dt\,dz=dz\,dt=0,\quad dz\,dz=dt. \quad (10.2.2) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.1 (Itô 引理)</b> 设 $F(t,x)$ 关于 $x$ 二阶可微、关于 $t$ 一阶可微，且 $dx=a\,dt+b\,dz$。则</p>
+    <div class="eq">$$ dF=F_t\,dt+F_x\,dx+\tfrac{1}{2}F_{xx}(dx)^2. \quad (10.2.1) $$</div>
+    <div class="eq">$$ dt\,dt=dt\,dz=dz\,dt=0,\quad dz\,dz=dt. \quad (10.2.2) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>Itô 引理 = 随机版链式法则。</b> 与普通链式法则 $dF=F_t\,dt+F_x\,dx$ 相比，多出二阶项 $\tfrac{1}{2}F_{xx}(dx)^2$。</p>
+    <p><b>为什么多二阶项？</b> 因 $dz\sim\sqrt{dt}$ 量级，$(dz)^2\approx dt$ 不是高阶无穷小。Taylor 展开时二阶项不能丢。这是 Itô 微积分与普通微积分的根本区别。</p>
+    <p><b>"乘法表" (10.2.2)：</b> $dt$ 是一阶无穷小，故 $dt\cdot dt=dt\cdot dz=0$；但 $dz\cdot dz=dt$（非零）。这张"乘法表"是 Itô 公式的运算法则，等价于"$dz$ 的平方 = $dt$"。</p>
+    <p><b>直观记忆：</b> 把 $dz$ 当作"$\sqrt{dt}$ 量级"，则 $dz^2\sim dt$、$dt^2\sim dt^2\approx 0$。这套规则可机械化使用。</p>
+  </div>
+</section>
+
+<!-- P19 -->
+<section class="page-card" id="p19">
+  <div class="page-head"><span class="page-num">P19</span><h2 class="page-title">10.2.2 布朗微分：Itô 公式</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>With $dx=a(\cdot)dt+b(\cdot)dz$, the square term is</p>
+    <div class="eq">$$ (dx)^2=a^2(\cdot)(dt)^2+2a(\cdot)b(\cdot)\,dt\,dz+b^2(\cdot)(dz)^2=b^2(\cdot)\,dt. $$</div>
+    <div class="eq">$$ dF=F_t\,dt+F_x a(\cdot)\,dt+F_x b(\cdot)\,dz+\tfrac{1}{2}F_{xx}b^2(\cdot)\,dt=\left\{F_t+F_x a(\cdot)+\tfrac{1}{2}F_{xx}b^2(\cdot)\right\}dt+F_x b(\cdot)\,dz. \quad (10.2.3) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>由 $dx=a\,dt+b\,dz$，平方项为</p>
+    <div class="eq">$$ (dx)^2=a^2(dt)^2+2ab\,dt\,dz+b^2(dz)^2=b^2\,dt. $$</div>
+    <div class="eq">$$ dF=\left\{F_t+F_x a+\tfrac{1}{2}F_{xx}b^2\right\}dt+F_x b\,dz. \quad (10.2.3) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$(dx)^2=b^2\,dt$ 的推导：</b> 展开 $(a\,dt+b\,dz)^2$ 得三项：$a^2 dt^2$（=0）、$2ab\,dt\,dz$（=0）、$b^2(dz)^2$（=$b^2 dt$）。只有最后一项存活，这就是 (10.2.2) 乘法表的应用。</p>
+    <p><b>代入 (10.2.1)：</b> $dF=F_t\,dt+F_x(a\,dt+b\,dz)+\tfrac{1}{2}F_{xx}b^2\,dt$，按 $dt$ 项与 $dz$ 项分组即得 (10.2.3)。</p>
+    <p><b>结果结构：</b> $dF$ 也是 SDE 形式：漂移项 $\{\cdots\}dt$ + 扩散项 $F_x b\,dz$。注意 $F$ 的"波动率"是 $F_x b$（即原波动率乘以 $F$ 对 $x$ 的敏感度），而<b>漂移多出 Itô 校正项 $\tfrac{1}{2}F_{xx}b^2$</b>——这是金融中"凸性增益"的来源（如久期-凸性、伊藤校正解释期权价值）。</p>
+  </div>
+</section>
+
+<!-- P20 -->
+<section class="page-card" id="p20">
+  <div class="page-head"><span class="page-num">P20</span><h2 class="page-title">10.2.2 布朗微分：多过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.2</b> Let $dx_i=a_i\,dt+b_{i1}\,dz_1+\cdots+b_{im}\,dz_m$, $i=1,\ldots,n$, so $dx=a\,dt+b\,dz(t)$. For $F(t,x):[0,\infty)\times\mathbb R^n\to\mathbb R$,</p>
+    <div class="eq">$$ dF(t,x)=F_t\,dt+\sum_{i=1}^n F_{x_i}\,dx_i+\tfrac{1}{2}\sum_{i=1}^n\sum_{j=1}^n F_{x_i x_j}[dx_i\,dx_j]. \quad (10.2.4) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.2 (多变量 Itô)</b> 设 $dx_i=a_i\,dt+\sum_k b_{ik}\,dz_k$，$i=1,\ldots,n$。对 $F(t,x):[0,\infty)\times\mathbb R^n\to\mathbb R$，</p>
+    <div class="eq">$$ dF=F_t\,dt+\sum_i F_{x_i}\,dx_i+\tfrac{1}{2}\sum_{i,j}F_{x_i x_j}[dx_i\,dx_j]. \quad (10.2.4) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>多变量 Itô 公式：</b> 与单变量相比，多出 $i\ne j$ 的交叉二阶项 $F_{x_i x_j}dx_i dx_j$。这些项在 $i\ne j$ 时是否为 0，取决于 $dz_i,dz_j$ 是否相关——下页处理。</p>
+    <p><b>记号 $[dx_i dx_j]$：</b> 这是二次协变差，按乘法表计算。在独立布朗情形 $dz_i dz_j=0$（$i\ne j$）；相关情形 $dz_i dz_j=\rho_{ij}dt$。</p>
+    <p><b>用法：</b> 把每个 $dx_i$ 用其 SDE 代入，按乘法表展开 $[dx_i dx_j]$，按 $dt,dz_1,\ldots,dz_m$ 分组，即得 $F$ 的 SDE。</p>
+  </div>
+</section>
+
+<!-- P21 -->
+<section class="page-card" id="p21">
+  <div class="page-head"><span class="page-num">P21</span><h2 class="page-title">10.2.2 布朗微分：相关性</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Brownian increments can be correlated. The quadratic variation rules become</p>
+    <div class="eq">$$ dt\,dt=dt\,dz_i=dz_i\,dt=0,\quad dz_i\,dz_j=\rho_{ij}\,dt. \quad (10.2.5) $$</div>
+    <p>If the Brownian motions are independent, then $\rho_{ij}=0$ for $i\ne j$ and $\rho_{ii}=1$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>布朗增量可以相关。二次变差规则变为</p>
+    <div class="eq">$$ dt\,dt=dt\,dz_i=dz_i\,dt=0,\quad dz_i\,dz_j=\rho_{ij}\,dt. \quad (10.2.5) $$</div>
+    <p>若各布朗运动独立，则 $i\ne j$ 时 $\rho_{ij}=0$，$\rho_{ii}=1$。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$\rho_{ij}$ 的意义：</b> $dz_i$ 与 $dz_j$ 的相关系数。$\rho_{ij}\in[-1,1]$，$\rho=0$ 不相关，$\rho=1$ 完全正相关，$\rho=-1$ 完全负相关。规则 $dz_i dz_j=\rho_{ij}dt$ 是"两个噪声的协变差"。</p>
+    <p><b>经济含义：</b> 多个资产/部门可能受<b>共同冲击</b>驱动。例如股票 1 与股票 2 都依赖全经济冲击，则 $\rho_{12}>0$。这影响组合的方差（除对角项外还有交叉项）。</p>
+    <p><b>$\rho_{ii}=1$：</b> 同一个 $dz_i$ 自乘就是 $(dz_i)^2=dt$，故自相关系数为 1。</p>
+  </div>
+</section>
+
+<!-- P22 -->
+<section class="page-card" id="p22">
+  <div class="page-head"><span class="page-num">P22</span><h2 class="page-title">10.2.2 布朗微分：两过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let $dx=a(t,x,y)\,dt+b(t,x,y)\,dz_x$, $dy=c(t,x,y)\,dt+g(t,x,y)\,dz_y$.</p>
+    <div class="eq">$$ dF=F_t\,dt+F_x\,dx+F_y\,dy+\tfrac{1}{2}\{F_{xx}(dx)^2+2F_{xy}\,dx\,dy+F_{yy}(dy)^2\}. \quad (10.2.6) $$</div>
+    <div class="eq">$$ (dx)^2=b^2\,dt,\;(dy)^2=g^2\,dt,\;dx\,dy=\rho_{xy}b(\cdot)g(\cdot)\,dt. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设 $dx=a\,dt+b\,dz_x$，$dy=c\,dt+g\,dz_y$。</p>
+    <div class="eq">$$ dF=F_t\,dt+F_x\,dx+F_y\,dy+\tfrac{1}{2}\{F_{xx}(dx)^2+2F_{xy}\,dx\,dy+F_{yy}(dy)^2\}. \quad (10.2.6) $$</div>
+    <div class="eq">$$ (dx)^2=b^2\,dt,\;(dy)^2=g^2\,dt,\;dx\,dy=\rho_{xy}b g\,dt. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>关键新增项：交叉项 $dx\,dy=\rho_{xy}bg\,dt$。</b> 这是两过程协变差，包含相关系数 $\rho_{xy}$。独立时 $\rho_{xy}=0$，此项消失。</p>
+    <p><b>用法：</b> 在 Itô 公式中把 $dx,dy$ 代入，平方项用上式替换，最后按 $dt,dz_x,dz_y$ 分组，得 $dF$ 的 SDE。下页给出最终式。</p>
+    <p><b>对比单变量：</b> 多了"协方差率 $\rho_{xy}bg$"项，对应组合理论中"两资产协方差贡献"。这正是为什么多资产组合的方差含协方差项。</p>
+  </div>
+</section>
+
+<!-- P23 -->
+<section class="page-card" id="p23">
+  <div class="page-head"><span class="page-num">P23</span><h2 class="page-title">10.2.2 布朗微分：两过程（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ dF=\{F_t+a(\cdot)F_x+c(\cdot)F_y+\tfrac{1}{2}b^2(\cdot)F_{xx}+\rho_{xy}b(\cdot)g(\cdot)F_{xy}+\tfrac{1}{2}g^2(\cdot)F_{yy}\}\,dt+b(\cdot)F_x\,dz_x+g(\cdot)F_y\,dz_y. \quad (10.2.7) $$</div>
+    <p>The only extra term relative to independent processes is the correlation term.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ dF=\{F_t+aF_x+cF_y+\tfrac{1}{2}b^2 F_{xx}+\rho_{xy}bg\,F_{xy}+\tfrac{1}{2}g^2 F_{yy}\}\,dt+bF_x\,dz_x+gF_y\,dz_y. \quad (10.2.7) $$</div>
+    <p>相对独立过程，唯一新增的是相关性项。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$\rho_{xy}bg\,F_{xy}$ 这一项：</b> 这是相关性引入的"交叉二阶项"，独立时为零。它度量"$x,y$ 联合变动如何通过 $F$ 的混合二阶偏导影响 $F$"。</p>
+    <p><b>漂移项的组成：</b> $F_t$（时间漂移）+ 一阶项 $aF_x+cF_y$（确定性变化）+ 二阶 Itô 校正 $\tfrac{1}{2}b^2F_{xx}+\rho_{xy}bg\,F_{xy}+\tfrac{1}{2}g^2F_{yy}$（三个二阶项分别对应 $x$ 自身、$xy$ 交叉、$y$ 自身）。</p>
+    <p><b>扩散项：</b> $bF_x dz_x+gF_y dz_y$。$F$ 对每个噪声的敏感度由相应偏导乘以原波动率决定。</p>
+  </div>
+</section>
+
+<!-- P24 -->
+<section class="page-card" id="p24">
+  <div class="page-head"><span class="page-num">P24</span><h2 class="page-title">10.2.2 布朗微分：单过程、多布朗</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let one state be driven by many Brownian motions: $dx=u_1\,dt+\sum_{i=1}^m v_i\,dz_i$.</p>
+    <div class="eq">$$ (dx)^2=(u_1\,dt)^2+2u_1\,dt\sum_i v_i\,dz_i+\left(\sum_i v_i\,dz_i\right)^2=\left(\sum_i v_i\,dz_i\right)^2. $$</div>
+    <div class="eq">$$ dF(t,x)=\{F_t+F_x u_1\}\,dt+\tfrac{1}{2}F_{xx}\left(\sum_i v_i\,dz_i\right)^2+F_x\sum_i v_i\,dz_i. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设一个状态由多个布朗运动驱动：$dx=u_1\,dt+\sum_i v_i\,dz_i$。</p>
+    <div class="eq">$$ (dx)^2=\left(\sum_i v_i\,dz_i\right)^2. $$</div>
+    <div class="eq">$$ dF=\{F_t+F_x u_1\}\,dt+\tfrac{1}{2}F_{xx}\left(\sum_i v_i\,dz_i\right)^2+F_x\sum_i v_i\,dz_i. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>结构：</b> 一个状态变量可被多个独立或相关布朗驱动。这种模型在金融中常见——一个股票回报由"市场因子"+"规模因子"+"价值因子"等多个风险源驱动（如 Fama-French 多因子模型）。</p>
+    <p><b>$(\sum v_i dz_i)^2$：</b> 按 (10.2.5) 乘法表展开 $=\sum_i\sum_j v_i v_j dz_i dz_j=\sum_{i,j}\rho_{ij}v_i v_j\,dt$。在独立情形退化为 $\sum_i v_i^2\,dt$（只剩对角项）。</p>
+    <p><b>用途：</b> 给定多因子 SDE，可对任意 $F(x)$ 求 SDE，用于组合分析、衍生品定价。</p>
+  </div>
+</section>
+
+<!-- P25 -->
+<section class="page-card" id="p25">
+  <div class="page-head"><span class="page-num">P25</span><h2 class="page-title">10.2.3 泊松微分：单过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.3</b> Let $dx(t)=a(\cdot)\,dt+b(\cdot)\,dq(t)$. For $F(t,x)$,</p>
+    <div class="eq">$$ dF(t,x)=F_t\,dt+F_x a(\cdot)\,dt+\{F(t,x+b(\cdot))-F(t,x)\}\,dq. \quad (10.2.8) $$</div>
+    <p>The continuous part is the usual derivative term. The jump term is the difference between post-jump and pre-jump values of $F$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.3 (CVF 单变量)</b> 设 $dx=a\,dt+b\,dq$。对 $F(t,x)$，</p>
+    <div class="eq">$$ dF=F_t\,dt+F_x a\,dt+\{F(t,x+b)-F(t,x)\}\,dq. \quad (10.2.8) $$</div>
+    <p>连续部分是通常导数项；跳跃项是 $F$ 跳后值与跳前值之差。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>CVF = Change of Variables Formula，变量代换公式。</b> 这是泊松版"Itô 引理"。结构上：</p>
+    <ul>
+      <li><b>连续部分 $F_t\,dt+F_x a\,dt$</b>：与普通链式法则相同，因 $dt$ 段路径连续、Taylor 一阶就够；</li>
+      <li><b>跳跃部分 $\{F(x+b)-F(x)\}\,dq$</b>：用<b>有限差分</b>替代导数。因跳跃有限大（非无穷小），必须用 $F$ 在跳后与跳前之<b>差</b>，而非 $F_x\,b$。</li>
+    </ul>
+    <p><b>对比布朗：</b> 布朗有 $\tfrac{1}{2}F_{xx}b^2$ 二阶校正项（因 $dz$ 虽小但 $(dz)^2$ 不为 0）；泊松没有二阶校正（$dq$ 取 0/1，$dq^2=dq$ 仍是 $dq$，不产生 $dt$ 项）。但泊松要求<b>用差分 $F(x+b)-F(x)$</b> 而非导数 $F_x b$，除非 $b$ 真是无穷小。</p>
+    <p><b>这是为什么泊松 SDE 中"漂移不是平均增长率"的根源：</b> 对 $F(x)=\ln x$，跳跃项是 $\ln(x+b)-\ln x=\ln(1+b/x)$，与导数 $b/x$ 不同——这就产生了 Itô 校正的等价物。</p>
+  </div>
+</section>
+
+<!-- P26 -->
+<section class="page-card" id="p26">
+  <div class="page-head"><span class="page-num">P26</span><h2 class="page-title">10.2.3 泊松微分：两独立过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.4</b> Let $dx=a(\cdot)dt+b(\cdot)dq_x$, $dy=c(\cdot)dt+g(\cdot)dq_y$, where $q_x,q_y$ are independent Poisson. For $F(x,y)$,</p>
+    <div class="eq">$$ dF=\{F_x a+F_y c\}\,dt+\{F(x+b,y)-F(x,y)\}\,dq_x+\{F(x,y+g)-F(x,y)\}\,dq_y. \quad (10.2.9) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.4</b> 设 $dx=a\,dt+b\,dq_x$，$dy=c\,dt+g\,dq_y$，$q_x,q_y$ 独立泊松。对 $F(x,y)$，</p>
+    <div class="eq">$$ dF=\{F_x a+F_y c\}\,dt+\{F(x+b,y)-F(x,y)\}\,dq_x+\{F(x,y+g)-F(x,y)\}\,dq_y. \quad (10.2.9) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>独立泊松 → 不发生同时跳跃：</b> 在 $dt$ 内两个独立泊松同时跳的概率是 $\lambda_x\lambda_y dt^2=O(dt^2)$，可忽略。故跳跃项分为两组：$x$ 跳时 $y$ 不变，$y$ 跳时 $x$ 不变。</p>
+    <p><b>每一项的结构：</b> $\{F(x+b,y)-F(x,y)\}dq_x$ 表示"仅 $x$ 跳时 $F$ 的变化"，这正好对应 $F$ 在 $x$ 方向的有限差分。</p>
+    <p><b>对比下页（同一泊松）：</b> 若 $q_x=q_y$（两过程共享同一跳跃源），则二者同时跳，跳跃项变成 $\{F(x+b,y+g)-F(x,y)\}dq$——这种"系统性跳跃"是危机建模的关键，下一页处理。</p>
+  </div>
+</section>
+
+<!-- P27 -->
+<section class="page-card" id="p27">
+  <div class="page-head"><span class="page-num">P27</span><h2 class="page-title">10.2.3 泊松微分：同一泊松过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.5</b> Let $dx=a(\cdot)dt+b(\cdot)dq$, $dy=c(\cdot)dt+g(\cdot)dq$. For $F(x,y)$,</p>
+    <div class="eq">$$ dF(x,y)=\{F_x a+F_y c\}\,dt+\{F(x+b,y+g)-F(x,y)\}\,dq. $$</div>
+    <p>A single aggregate jump changes both arguments simultaneously.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.5</b> 设 $dx=a\,dt+b\,dq$，$dy=c\,dt+g\,dq$（同一 $q$）。对 $F(x,y)$，</p>
+    <div class="eq">$$ dF=\{F_x a+F_y c\}\,dt+\{F(x+b,y+g)-F(x,y)\}\,dq. $$</div>
+    <p>一次聚合跳跃同时改变两个自变量。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>系统性跳跃 vs 独立跳跃：</b> 若两过程共享同一 $q$，则每次跳跃<b>同时</b>影响两者——这是"系统性风险"模型化。例如危机同时使股票价 $S$ 跳、TFP $A$ 跳。</p>
+    <p><b>跳跃项 $\{F(x+b,y+g)-F(x,y)\}dq$：</b> 这是 $F$ 在两变量同时跳时的有限差分。与独立情形不同，不能拆成两项之和。</p>
+    <p><b>对比布朗相关性：</b> 布朗相关由 $\rho_{xy}$ 连续调节；泊松"相关"则由是否共享 $q$ 决定——二元（要么完全独立要么完全同步），更接近"危机同时冲击所有资产"的现实直觉。</p>
+  </div>
+</section>
+
+<!-- P28 -->
+<section class="page-card" id="p28">
+  <div class="page-head"><span class="page-num">P28</span><h2 class="page-title">10.2.3 泊松微分：多过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let $x(t)=(x_1(t),\ldots,x_n(t))^T$ and $dx_i(t)=\alpha_i(\cdot)\,dt+\beta_{i1}(\cdot)\,dq_1+\cdots+\beta_{im}(\cdot)\,dq_m$, $i=1,\ldots,n$. (10.2.10)</p>
+    <p>Each variable can be affected by each of the $m$ Poisson processes.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设 $x(t)=(x_1,\ldots,x_n)^T$，$dx_i=\alpha_i\,dt+\sum_{j=1}^m\beta_{ij}\,dq_j$，$i=1,\ldots,n$。(10.2.10)</p>
+    <p>每个变量都可受每个泊松过程影响。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>多变量 × 多泊松源：</b> 一般情形——$n$ 个状态变量、$m$ 个泊松冲击源。每个变量 $x_i$ 对每个冲击 $q_j$ 都有自己的敏感度 $\beta_{ij}$。</p>
+    <p><b>对比 CAPM 类比：</b> $\beta_{ij}$ 类似"因子载荷"——变量 $i$ 对因子 $j$ 的暴露。多因子模型在跳跃框架下就是这种结构。</p>
+    <p><b>下页命题 10.2.1 给出一般 CVF：</b> 把每个 $q_j$ 的跳跃贡献相加，每项是"$F$ 在 $x$ 沿 $\beta_j$ 向量跳跃后的差分"。</p>
+  </div>
+</section>
+
+<!-- P29 -->
+<section class="page-card" id="p29">
+  <div class="page-head"><span class="page-num">P29</span><h2 class="page-title">10.2.3 泊松微分：一般 CVF</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Proposition 10.2.1</b> For a once continuously differentiable $F(t,x)$,</p>
+    <div class="eq">$$ dF(t,x(t))=\left\{F_t(\cdot)+\sum_{i=1}^n F_{x_i}(\cdot)\alpha_i(\cdot)\right\}dt+\sum_{j=1}^m\left\{F\!\left(t,x(t)+\beta_j(\cdot)\right)-F(t,x(t))\right\}dq_j, \quad (10.2.11) $$</div>
+    <p>where $\beta_j=(\beta_{1j},\ldots,\beta_{nj})^T$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>命题 10.2.1 (一般 CVF)</b> 对一阶连续可微的 $F(t,x)$，</p>
+    <div class="eq">$$ dF=\left\{F_t+\sum_i F_{x_i}\alpha_i\right\}dt+\sum_j\left\{F(t,x+\beta_j)-F(t,x)\right\}dq_j. \quad (10.2.11) $$</div>
+    <p>其中 $\beta_j=(\beta_{1j},\ldots,\beta_{nj})^T$。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>结构总结：</b> 连续部分 $F_t+\sum F_{x_i}\alpha_i$ 是普通链式（一阶可微即够）；跳跃部分对每个 $q_j$ 求 $F$ 沿 $\beta_j$ 向量跳跃后的差分。</p>
+    <p><b>$\beta_j$ 是"跳跃方向向量"：</b> 当 $q_j$ 跳时，所有 $x_i$ 同时变化 $\beta_{ij}$，即 $x\to x+\beta_j$。$F$ 的相应变化是 $F(x+\beta_j)-F(x)$。这与上一页"共享 $q$"的逻辑一致。</p>
+    <p><b>只要求一阶可微：</b> 注意命题条件——泊松 CVF 只需 $F$ 一阶可微，<b>不需二阶可微</b>（与布朗 Itô 引理对比）。这是因为泊松跳跃是"有限差分"而非"二次变差"。</p>
+  </div>
+</section>
+
+<!-- P30 -->
+<section class="page-card" id="p30">
+  <div class="page-head"><span class="page-num">P30</span><h2 class="page-title">10.2.4 布朗运动 + 泊松过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.2.6</b> Let $dx=a(\cdot)dt+b(\cdot)dz+g(\cdot)dq$. (10.2.12) For $F(t,x)$,</p>
+    <div class="eq">$$ dF(t,x)=\left\{F_t+F_x a+\tfrac{1}{2}F_{xx}b^2\right\}dt+F_x b\,dz+\{F(t,x+g)-F(t,x)\}\,dq. \quad (10.2.13) $$</div>
+    <p>This combines Ito's lemma for Brownian motion and the CVF for Poisson jumps.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.2.6 (跳跃-扩散)</b> 设 $dx=a\,dt+b\,dz+g\,dq$ (10.2.12)。对 $F(t,x)$，</p>
+    <div class="eq">$$ dF=\left\{F_t+F_x a+\tfrac{1}{2}F_{xx}b^2\right\}dt+F_x b\,dz+\{F(t,x+g)-F(t,x)\}\,dq. \quad (10.2.13) $$</div>
+    <p>结合了布朗的 Itô 引理与泊松的 CVF。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>跳跃-扩散模型（jump-diffusion）：</b> 同时含布朗扩散（连续小冲击）与泊松跳跃（稀疏大冲击）的 SDE。这是 Merton 1976 期权定价模型的标准框架，能同时解释"日常波动"和"危机跳跃"。</p>
+    <p><b>$dF$ 三部分结构：</b></p>
+    <ul>
+      <li>漂移 $\{F_t+F_x a+\tfrac{1}{2}F_{xx}b^2\}dt$：含 Itô 校正（来自布朗）；</li>
+      <li>扩散 $F_x b\,dz$：来自布朗；</li>
+      <li>跳跃 $\{F(x+g)-F(x)\}\,dq$：来自泊松，用差分而非导数。</li>
+    </ul>
+    <p><b>关键校验点：</b> 布朗与泊松"不交叉"——$dz\,dq=0$ 因 $dq$ 在 $dt$ 内取 0/1，$dz\,dq$ 的量级是 $\sqrt{dt}\cdot dt$，仍是高阶无穷小。所以无 $dz\,dq$ 交叉项。</p>
+  </div>
+</section>
+
+<!-- P31 -->
+<section class="page-card" id="p31">
+  <div class="page-head"><span class="page-num">P31</span><h2 class="page-title">10.3.1 期权定价</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>The starting point is the price $S$ of an asset following geometric Brownian motion. The option price is a function $F(t,S(t))$.</p>
+    <div class="eq">$$ \frac{dS}{S}=\alpha\,dt+\sigma\,dz. \quad (10.3.1) $$</div>
+    <div class="eq">$$ dF=F_t\,dt+F_S\,dS+\tfrac{1}{2}F_{SS}[dS]^2. \quad (10.3.2) $$</div>
+    <div class="eq">$$ (dS)^2=\sigma^2 S^2\,dt. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>从资产价 $S$ 服从几何布朗出发，期权价是 $F(t,S(t))$。</p>
+    <div class="eq">$$ \frac{dS}{S}=\alpha\,dt+\sigma\,dz. \quad (10.3.1) $$</div>
+    <div class="eq">$$ dF=F_t\,dt+F_S\,dS+\tfrac{1}{2}F_{SS}(dS)^2. \quad (10.3.2) $$</div>
+    <div class="eq">$$ (dS)^2=\sigma^2 S^2\,dt. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>几何布朗 (GBM)：</b> $dS/S=\alpha\,dt+\sigma\,dz$ 描述资产价的对数正态动态，是 Black-Scholes 模型的基本假设。$\alpha$ 是期望回报率，$\sigma$ 是波动率。</p>
+    <p><b>对 $F(t,S)$ 用 Itô：</b> 把 $F$ 看作期权价格（衍生品），它的动态由 $S$ 的动态通过 Itô 引理决定。$(dS)^2=\sigma^2 S^2\,dt$ 是关键一步（用乘法表 $dz^2=dt$）。</p>
+    <p><b>目标：</b> 求出 $F$ 满足的 PDE（即 Black-Scholes PDE），结合边界条件解得期权定价公式。</p>
+  </div>
+</section>
+
+<!-- P32 -->
+<section class="page-card" id="p32">
+  <div class="page-head"><span class="page-num">P32</span><h2 class="page-title">10.3.1 期权定价：期权动态</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ dF=\left\{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}\right\}dt+\sigma S F_S\,dz, \quad (10.3.3) $$</div>
+    <div class="eq">$$ \frac{dF}{F}\equiv\alpha_F\,dt+\sigma_F\,dz,\quad \alpha_F=\frac{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}}{F},\;\sigma_F=\frac{\sigma S F_S}{F}. \quad (10.3.4) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ dF=\left\{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}\right\}dt+\sigma S F_S\,dz. \quad (10.3.3) $$</div>
+    <div class="eq">$$ \frac{dF}{F}=\alpha_F\,dt+\sigma_F\,dz,\;\alpha_F=\frac{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}}{F},\;\sigma_F=\frac{\sigma S F_S}{F}. \quad (10.3.4) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>期权也是几何布朗（在 SDE 形式上）：</b> 把 $dF$ 写成 $dF/F=\alpha_F\,dt+\sigma_F\,dz$，可见期权价服从另一个 GBM，但其漂移 $\alpha_F$ 与波动率 $\sigma_F$ 都依赖 $F$ 自身的偏导数。</p>
+    <p><b>$\sigma_F=\sigma S F_S/F$：</b> 期权波动率 = 标的波动率 × 即期价 × Delta（$F_S$） / 期权价。这就是<b>"杠杆效应"</b>：期权价低、Delta 接近 1 时，期权波动率远大于标的，是期权高贝塔的来源。</p>
+    <p><b>$\alpha_F$ 中的 Itô 校正项 $\tfrac{1}{2}\sigma^2 S^2 F_{SS}$：</b> 来自二次变差，决定期权时间价值。下一页用无套利把它消掉。</p>
+  </div>
+</section>
+
+<!-- P33 -->
+<section class="page-card" id="p33">
+  <div class="page-head"><span class="page-num">P33</span><h2 class="page-title">10.3.1 期权定价：组合</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Consider a portfolio of the asset, the option, and a riskless asset.</p>
+    <div class="eq">$$ P=N_1 S+N_2 F+N_3 M. $$</div>
+    <div class="eq">$$ dP=N_1\,dS+N_2\,dF+N_3\,dM,\quad \frac{dP}{P}=\frac{N_1 S}{P}\frac{dS}{S}+\frac{N_2 F}{P}\frac{dF}{F}+\frac{N_3 M}{P}\frac{dM}{M}. $$</div>
+    <div class="eq">$$ \theta_1\equiv\frac{N_1 S}{P},\;\theta_2\equiv\frac{N_2 F}{P}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>考虑由资产、期权、无风险资产构成的组合。</p>
+    <div class="eq">$$ P=N_1 S+N_2 F+N_3 M. $$</div>
+    <div class="eq">$$ \frac{dP}{P}=\theta_1\frac{dS}{S}+\theta_2\frac{dF}{F}+\frac{N_3 M}{P}\frac{dM}{M},\quad \theta_1=\frac{N_1 S}{P},\;\theta_2=\frac{N_2 F}{P}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>组合权重 $\theta_i$：</b> 各资产在组合中的价值占比。$\theta_1+\theta_2+N_3M/P=1$（价值和为 1）。</p>
+    <p><b>无风险资产 $M$：</b> 满足 $dM/M=r\,dt$，即以无风险利率 $r$ 增长。它是"锚"，提供无风险回报基准。</p>
+    <p><b>构造组合的目的：</b> 通过选择 $\theta_1,\theta_2$ 消除风险（使 $dz$ 项系数为 0），从而把含风险组合转化为无风险组合。再用无套利原理使其回报等于 $r$，即可解出 $F$ 满足的方程。这是 BS 推导的标准 Delta-对冲方法。</p>
+  </div>
+</section>
+
+<!-- P34 -->
+<section class="page-card" id="p34">
+  <div class="page-head"><span class="page-num">P34</span><h2 class="page-title">10.3.1 期权定价：无套利</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ \frac{dP}{P}=\{\theta_1(\alpha-r)+\theta_2(\alpha_F-r)+r\}\,dt+\{\theta_1\sigma+\theta_2\sigma_F\}\,dz. \quad (10.3.5) $$</div>
+    <p>Choose weights so the portfolio has no risk: $\theta_1\sigma+\theta_2\sigma_F=0$. (10.3.6)</p>
+    <div class="eq">$$ \frac{dP/dt}{P}=\theta_1(\alpha-r)+\theta_2(\alpha_F-r)+r=r. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ \frac{dP}{P}=\{\theta_1(\alpha-r)+\theta_2(\alpha_F-r)+r\}\,dt+\{\theta_1\sigma+\theta_2\sigma_F\}\,dz. \quad (10.3.5) $$</div>
+    <p>选权重使组合无风险：$\theta_1\sigma+\theta_2\sigma_F=0$。(10.3.6)</p>
+    <div class="eq">$$ \frac{dP/dt}{P}=\theta_1(\alpha-r)+\theta_2(\alpha_F-r)+r=r. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>关键一步：令 $dz$ 系数为 0。</b> 这是 Delta-对冲——选 $\theta_1=-\theta_2\sigma_F/\sigma$ 使组合波动率为零。此时组合完全无风险（无 $dz$ 项）。</p>
+    <p><b>无套利 → 回报必为 $r$：</b> 一个无风险组合的回报必须等于无风险利率 $r$，否则可套利（借钱买组合或反之）。这就给出条件 $\theta_1(\alpha-r)+\theta_2(\alpha_F-r)+r=r$，化简为 $\theta_1(\alpha-r)+\theta_2(\alpha_F-r)=0$。</p>
+    <p><b>下一页用此推出 BS PDE：</b> 把 $\alpha_F$ 的表达式代入，再用 $\theta_1\sigma=-\theta_2\sigma_F$ 消去权重比，得到只含 $F$ 偏导数的方程。</p>
+  </div>
+</section>
+
+<!-- P35 -->
+<section class="page-card" id="p35">
+  <div class="page-head"><span class="page-num">P35</span><h2 class="page-title">10.3.1 期权定价：Black-Scholes PDE</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>No arbitrage implies equality of market prices of risk:</p>
+    <div class="eq">$$ \frac{\alpha-r}{\sigma}=\frac{\alpha_F-r}{\sigma_F}. $$</div>
+    <div class="eq">$$ \frac{\alpha-r}{\sigma}=\frac{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}-rF}{\sigma S F_S}. $$</div>
+    <div class="eq">$$ \tfrac{1}{2}\sigma^2 S^2 F_{SS}+r S F_S-rF+F_t=0. \quad (10.3.7) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>无套利蕴含风险价格相等：</p>
+    <div class="eq">$$ \frac{\alpha-r}{\sigma}=\frac{\alpha_F-r}{\sigma_F}. $$</div>
+    <div class="eq">$$ \frac{\alpha-r}{\sigma}=\frac{F_t+\alpha S F_S+\tfrac{1}{2}\sigma^2 S^2 F_{SS}-rF}{\sigma S F_S}. $$</div>
+    <div class="eq">$$ \tfrac{1}{2}\sigma^2 S^2 F_{SS}+r S F_S-rF+F_t=0. \quad (10.3.7) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"风险价格"（market price of risk）：</b> $(\alpha-r)/\sigma$ 度量"每单位波动率换得的超额回报"。无套利要求<b>所有资产</b>有相同的风险价格，否则可以重组组合套利。</p>
+    <p><b>推导 BS PDE：</b> 把 $\alpha_F$ 表达式代入等式，再用 (10.3.6) 把 $\alpha$ 消掉（或直接整理）。注意 $(\alpha-r)/\sigma$ 这一项两边相等，可以把含 $\alpha$ 的项消掉，最终只剩 $F$ 偏导数与 $r$——这就是 (10.3.7)。</p>
+    <p><b>BS PDE 的意义：</b> (10.3.7) 是只含 $F$ 及其偏导数的偏微分方程，<b>不含漂移 $\alpha$</b>——这是 Black-Scholes 的著名结论：期权价不依赖标的期望回报率，只依赖波动率 $\sigma$、利率 $r$、行权价、到期时间。结合欧式看涨期权的边界条件（下文 P43），即可解出 BS 公式。</p>
+  </div>
+</section>
+
+<!-- P36 -->
+<section class="page-card" id="p36">
+  <div class="page-head"><span class="page-num">P36</span><h2 class="page-title">10.3.2 推导预算约束</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Wealth equals the number of stocks times the stock price: $a(t)=n(t)v(t)$.</p>
+    <p>The stock price follows a Poisson-driven geometric process:</p>
+    <div class="eq">$$ dv(t)=\alpha v(t)\,dt+\beta v(t)\,dq(t),\quad \beta>-1. \quad (10.3.8) $$</div>
+    <div class="eq">$$ dn(t)=\frac{n(t)\pi(t)+w(t)-p(t)c(t)}{v(t)}\,dt. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>财富 = 持股数 × 股价：$a(t)=n(t)v(t)$。</p>
+    <p>股价服从泊松驱动的几何过程：</p>
+    <div class="eq">$$ dv(t)=\alpha v(t)\,dt+\beta v(t)\,dq(t),\quad \beta>-1. \quad (10.3.8) $$</div>
+    <div class="eq">$$ dn(t)=\frac{n(t)\pi(t)+w(t)-p(t)c(t)}{v(t)}\,dt. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>目标：</b> 给定股价 $v(t)$ 的动态与持股 $n(t)$ 的积累方程，求财富 $a(t)=n(t)v(t)$ 满足的 SDE（预算约束）。</p>
+    <p><b>股价几何泊松：</b> $dv/v=\alpha\,dt+\beta\,dq$，每次跳跃使股价变为 $(1+\beta)v$（$\beta>-1$ 保证股价非负）。</p>
+    <p><b>持股积累：</b> $n\pi$ 是股息收入（持股数 × 每股股息），$w$ 是工资，$pc$ 是消费支出；剩余用于购新股，故 $dn=(n\pi+w-pc)/v\,dt$。注意 $dn$ 只有 $dt$ 项、无 $dq$ 项——即<b>持股数在跳跃时不变</b>，跳跃只改股价。</p>
+    <p><b>下一步：</b> 对 $a=n\cdot v$ 用 CVF，得财富的 SDE。这是连续时间下"家庭预算约束"的标准推导。</p>
+  </div>
+</section>
+
+<!-- P37 -->
+<section class="page-card" id="p37">
+  <div class="page-head"><span class="page-num">P37</span><h2 class="page-title">10.3.2 推导预算约束：CVF</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Apply the CVF to $a(t)=n(t)v(t)$.</p>
+    <div class="eq">$$ da(t)=\left\{v(t)\frac{n(t)\pi(t)+w(t)-p(t)c(t)}{v(t)}+n(t)\alpha v(t)\right\}dt+\{n(t)[v(t)+\beta v(t)]-n(t)v(t)\}\,dq(t). $$</div>
+    <div class="eq">$$ da(t)=\{r(t)a(t)+w(t)-p(t)c(t)\}\,dt+\beta a(t)\,dq(t), \quad (10.3.9)\quad r(t)\equiv\frac{\pi(t)}{v(t)}+\alpha. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对 $a(t)=n(t)v(t)$ 应用 CVF。</p>
+    <div class="eq">$$ da=\left\{n\pi+w-pc+n\alpha v\right\}dt+\{n(v+\beta v)-nv\}\,dq. $$</div>
+    <div class="eq">$$ da(t)=\{r(t)a(t)+w(t)-p(t)c(t)\}\,dt+\beta a(t)\,dq(t), \quad (10.3.9) $$</div>
+    <div class="eq">$$ r(t)\equiv\frac{\pi(t)}{v(t)}+\alpha. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>CVF 应用细节：</b> $F(n,v)=nv$，连续部分由 $n,v$ 各自 $dt$ 项贡献：$v\,dn+n\,dv$ 的 $dt$ 部分 = $v\cdot\frac{n\pi+w-pc}{v}\,dt+n\cdot\alpha v\,dt=(n\pi+w-pc+n\alpha v)\,dt$。</p>
+    <p><b>跳跃部分：</b> 当 $q$ 跳，$v\to v+\beta v=(1+\beta)v$，$n$ 不变。故 $a=nv\to n(1+\beta)v$，差分 $=n\beta v=\beta a$。即跳跃使财富按 $\beta$ 比例增长。</p>
+    <p><b>$r(t)$ 的含义：</b> $r=\pi/v+\alpha$。$\pi/v$ 是股息率（每股股息/股价），$\alpha$ 是股价平均增长率，二者之和是<b>股票总回报率</b>。这就是连续时间版的"资产回报率"。</p>
+    <p><b>预算约束 (10.3.9)：</b> $da=\{ra+w-pc\}dt+\beta a\,dq$——财富按回报率 $r$ 增长，加上工资，减去消费支出；股价跳跃时财富按 $\beta$ 同步跳跃。这是后续求解家庭问题的起点。</p>
+  </div>
+</section>
+
+<!-- P38 -->
+<section class="page-card" id="p38">
+  <div class="page-head"><span class="page-num">P38</span><h2 class="page-title">10.4.1 布朗运动示例</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A differential representation of production is</p>
+    <div class="eq">$$ dY(t)=AK\,dt+\sigma K\,dz(t), \quad (10.4.1) $$</div>
+    <p>With initial condition $Y_0$ and $z(0)$, the solution is</p>
+    <div class="eq">$$ Y(t)=Y_0+AKt+\sigma K[z(t)-z(0)]. $$</div>
+    <div class="eq">$$ Y_0=z(0)=0\Rightarrow Y(t)=(At+\sigma z(t))K. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>产出的微分表示为</p>
+    <div class="eq">$$ dY(t)=AK\,dt+\sigma K\,dz(t), \quad (10.4.1) $$</div>
+    <p>初值 $Y_0,z(0)$ 下，解为</p>
+    <div class="eq">$$ Y(t)=Y_0+AKt+\sigma K[z(t)-z(0)]. $$</div>
+    <div class="eq">$$ Y_0=z(0)=0\Rightarrow Y(t)=(At+\sigma z(t))K. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>这是线性 SDE（被积函数为常数）的简单解：</b> 因 $dY$ 右边系数 $AK,\sigma K$ 不依赖 $Y$，可直接积分：$Y(t)-Y_0=\int_0^t AK\,ds+\int_0^t\sigma K\,dz=AKt+\sigma K z(t)$（用 $z(0)=0$）。</p>
+    <p><b>意义：</b> 产出 = 趋势 $AKt$ + 随机扰动 $\sigma K z(t)$。此模型下 $Y$ 可<b>取负值</b>（$z(t)$ 可为任意大负数），不合适做生产函数。下两页用"几何布朗"避免此问题。</p>
+    <p><b>教学逻辑：</b> 先看最简单的线性 SDE 体会"积分求解"的思路，再升级到非线性（如几何）情形。</p>
+  </div>
+</section>
+
+<!-- P39 -->
+<section class="page-card" id="p39">
+  <div class="page-head"><span class="page-num">P39</span><h2 class="page-title">10.4.1 布朗示例：TFP</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Alternatively, let $Y(t)=A(t)K$ and TFP follow Brownian motion with drift.</p>
+    <div class="eq">$$ dA(t)=g\,dt+\sigma\,dz(t). $$</div>
+    <div class="eq">$$ A(t)=A_0+gt+\sigma z(t). $$</div>
+    <div class="eq">$$ Y(t)=(A_0+gt+\sigma z(t))K=A_0 K+gKt+\sigma K z(t). $$</div>
+    <p>Output can still become negative because Brownian motion can take negative values.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>替代地，设 $Y(t)=A(t)K$，TFP 服从带漂移布朗运动。</p>
+    <div class="eq">$$ dA(t)=g\,dt+\sigma\,dz(t). $$</div>
+    <div class="eq">$$ A(t)=A_0+gt+\sigma z(t). $$</div>
+    <div class="eq">$$ Y(t)=(A_0+gt+\sigma z(t))K=A_0 K+gKt+\sigma K z(t). $$</div>
+    <p>产出仍可能为负，因布朗运动可取负值。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>把 TFP 直接设为布朗运动的问题：</b> 因 $z(t)$ 可任意大负值，$A(t)=A_0+gt+\sigma z(t)$ 可能为负，使产出 $Y$ 也为负，不符合生产函数的定义（产出应非负）。</p>
+    <p><b>解决方案：几何布朗（下页）。</b> 让 $dA/A=g\,dt+\sigma\,dz$，则 $A(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}>0$ 恒正。</p>
+    <p><b>$g-\tfrac{1}{2}\sigma^2$ 的来源：</b> 这是 Itô 校正——对 $\ln A$ 用 Itô 引理时，$d\ln A=(g-\tfrac12\sigma^2)dt+\sigma\,dz$。这一项保证 $A$ 的期望增长率仍是 $g$（而非 $g-\tfrac12\sigma^2$）。下一页详细推导。</p>
+  </div>
+</section>
+
+<!-- P40 -->
+<section class="page-card" id="p40">
+  <div class="page-head"><span class="page-num">P40</span><h2 class="page-title">10.4.1 布朗示例：几何 BM</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>To avoid negative TFP, assume geometric Brownian motion:</p>
+    <div class="eq">$$ \frac{dA(t)}{A(t)}=g\,dt+\sigma\,dz(t). \quad (10.4.2) $$</div>
+    <div class="eq">$$ A(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}. \quad (10.4.3) $$</div>
+    <div class="eq">$$ Y(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}K>0. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>为避免 TFP 为负，设其服从几何布朗：</p>
+    <div class="eq">$$ \frac{dA}{A}=g\,dt+\sigma\,dz(t). \quad (10.4.2) $$</div>
+    <div class="eq">$$ A(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}. \quad (10.4.3) $$</div>
+    <div class="eq">$$ Y(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}K>0. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>解的来源：</b> 令 $x(t)=(g-\tfrac12\sigma^2)t+\sigma z(t)$，则 $A=A_0 e^x$。对 $F(x)=A_0 e^x$ 用 Itô：$F_x=A_0 e^x=A$，$F_{xx}=A_0 e^x=A$，$dx=(g-\tfrac12\sigma^2)dt+\sigma\,dz$。代入 (10.2.3)：$dA=\{0+A(g-\tfrac12\sigma^2)+\tfrac12 A\sigma^2\}dt+A\sigma\,dz=\{gA\}dt+A\sigma\,dz$，即 $dA/A=g\,dt+\sigma\,dz$，正是 (10.4.2)。这验证了解。</p>
+    <p><b>$g-\tfrac12\sigma^2$ vs $g$：</b> 在 SDE $dA/A=g\,dt+\sigma\,dz$ 中，$g$ 是<b>瞬时漂移</b>，但 $\ln A$ 的漂移是 $g-\tfrac12\sigma^2$（Itô 校正）。期望意义下 $E[A(t)]/A_0=e^{gt}$（增长率 $g$），因为 $-\tfrac12\sigma^2$ 与 $E[e^{\sigma z(t)}]=e^{\tfrac12\sigma^2 t}$ 的项抵消。</p>
+    <p><b>几何布朗的意义：</b> $A$ 恒正（指数函数），符合 TFP、资产价等"价格性"变量的要求。这是金融建模的基石。</p>
+  </div>
+</section>
+
+<!-- P41 -->
+<section class="page-card" id="p41">
+  <div class="page-head"><span class="page-num">P41</span><h2 class="page-title">10.4.1 布朗示例：验证</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Define $x(t)\equiv(g-\tfrac12\sigma^2)t+\sigma z(t)$ and $A(t)=F(x(t))=A_0 e^{x(t)}$.</p>
+    <div class="eq">$$ dx(t)=\left(g-\tfrac12\sigma^2\right)dt+\sigma\,dz(t). $$</div>
+    <div class="eq">$$ dA(t)=dF(x(t))=\left\{F_x(x(t))\left(g-\tfrac12\sigma^2\right)+\tfrac12 F_{xx}(x(t))\sigma^2\right\}dt+F_x(x(t))\sigma\,dz. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>定义 $x(t)\equiv(g-\tfrac12\sigma^2)t+\sigma z(t)$，$A(t)=F(x(t))=A_0 e^{x(t)}$。</p>
+    <div class="eq">$$ dx(t)=\left(g-\tfrac12\sigma^2\right)dt+\sigma\,dz(t). $$</div>
+    <div class="eq">$$ dA=\left\{F_x\left(g-\tfrac12\sigma^2\right)+\tfrac12 F_{xx}\sigma^2\right\}dt+F_x\sigma\,dz. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>对 $F(x)=A_0 e^x$ 用 Itô：</b> $F_x=A_0 e^x=A$，$F_{xx}=A_0 e^x=A$（指数函数的特性）。代入上式，漂移项成为 $A(g-\tfrac12\sigma^2)+\tfrac12 A\sigma^2=Ag$。</p>
+    <p><b>对照 (10.2.3)：$dF=(F_t+F_x a+\tfrac12 F_{xx}b^2)dt+F_x b\,dz$。</b> 这里 $F_t=0$，$a=g-\tfrac12\sigma^2$，$b=\sigma$。代入即得上式。</p>
+    <p><b>下页整理：</b> 把 $F_x=F_{xx}=A$ 代入，化简得 $dA/A=g\,dt+\sigma\,dz$，验证了 $A(t)=A_0 e^x$ 确实是 (10.4.2) 的解。这种"猜测 + Itô 验证"是解 SDE 的标准技巧。</p>
+  </div>
+</section>
+
+<!-- P42 -->
+<section class="page-card" id="p42">
+  <div class="page-head"><span class="page-num">P42</span><h2 class="page-title">10.4.1 布朗示例：验证（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ dA(t)=\left\{A_0 e^{x(t)}\left(g-\tfrac12\sigma^2\right)+\tfrac12 A_0 e^{x(t)}\sigma^2\right\}dt+A_0 e^{x(t)}\sigma\,dz. $$</div>
+    <div class="eq">$$ \frac{dA(t)}{A(t)}=\left(g-\tfrac12\sigma^2+\tfrac12\sigma^2\right)dt+\sigma\,dz=g\,dt+\sigma\,dz. $$</div>
+    <p>Hence the candidate solution satisfies the original SDE.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ dA=\left\{A\left(g-\tfrac12\sigma^2\right)+\tfrac12 A\sigma^2\right\}dt+A\sigma\,dz. $$</div>
+    <div class="eq">$$ \frac{dA}{A}=\left(g-\tfrac12\sigma^2+\tfrac12\sigma^2\right)dt+\sigma\,dz=g\,dt+\sigma\,dz. $$</div>
+    <p>故候选解满足原 SDE。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>Itô 校正的抵消：</b> $-\tfrac12\sigma^2$（$x$ 的漂移中的校正）与 $+\tfrac12\sigma^2$（Itô 公式给 $F$ 带来的二阶校正）恰好抵消，使 $dA/A$ 的漂移回到 $g$。这正是设计 $x$ 时减去 $\tfrac12\sigma^2$ 的原因——为了保证 $A$ 的瞬时增长率是 $g$。</p>
+    <p><b>"候选解 + 验证"方法：</b> SDE 一般无显式解，但若能猜出形式，可用 Itô 引理验证。这是 SDE 求解的常用技巧（10.4.2、10.4.3 都用此法）。</p>
+  </div>
+</section>
+
+<!-- P43 -->
+<section class="page-card" id="p43">
+  <div class="page-head"><span class="page-num">P43</span><h2 class="page-title">10.4.1 布朗示例：期权定价</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For a European call option with maturity $T$ and strike price $P$, the PDE is (10.3.7). Boundary conditions are</p>
+    <div class="eq">$$ F(t,0)=0,\quad F(T,S)=\max\{0,S-P\}. $$</div>
+    <div class="eq">$$ F(t,S(t))=S(t)\varphi(d_1)-Pe^{-r[T-t]}\varphi(d_2). \quad (10.4.4) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对到期 $T$、行权价 $P$ 的欧式看涨期权，PDE 为 (10.3.7)。边界条件为</p>
+    <div class="eq">$$ F(t,0)=0,\quad F(T,S)=\max\{0,S-P\}. $$</div>
+    <div class="eq">$$ F(t,S(t))=S(t)\varphi(d_1)-Pe^{-r[T-t]}\varphi(d_2). \quad (10.4.4) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>欧式看涨期权：</b> 到期日 $T$ 时以价 $P$ 买入标的的权利（非义务）。故到期收益为 $\max\{0,S-P\}$：若 $S>P$ 行权赚 $S-P$；否则放弃权利收益 0。</p>
+    <p><b>边界条件 $F(t,0)=0$：</b> 标的价为 0 时期权一文不值（不会涨回正值）。</p>
+    <p><b>BS 公式 (10.4.4)：</b> 看涨期权价 = $S\varphi(d_1)-Pe^{-r(T-t)}\varphi(d_2)$，其中 $\varphi$ 是标准正态 CDF。第一项是"标的份额 × Delta"，第二项是"行权价现值 × 行权概率"。下页给出 $d_1,d_2$。</p>
+  </div>
+</section>
+
+<!-- P44 -->
+<section class="page-card" id="p44">
+  <div class="page-head"><span class="page-num">P44</span><h2 class="page-title">10.4.1 布朗示例：Black-Scholes 公式</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ \varphi(y)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^y e^{-u^2/2}\,du. $$</div>
+    <div class="eq">$$ d_1=\frac{\ln\frac{S(t)}{P}+\left(r+\tfrac12\sigma^2\right)(T-t)}{\sigma\sqrt{T-t}},\quad d_2=d_1-\sigma\sqrt{T-t}. $$</div>
+    <p>The option price is a function of $S(t)$, time to maturity, volatility, and the riskless rate.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ \varphi(y)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^y e^{-u^2/2}\,du. $$</div>
+    <div class="eq">$$ d_1=\frac{\ln(S(t)/P)+(r+\tfrac12\sigma^2)(T-t)}{\sigma\sqrt{T-t}},\quad d_2=d_1-\sigma\sqrt{T-t}. $$</div>
+    <p>期权价是 $S(t)$、剩余期限、波动率与无风险利率的函数。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$\varphi(\cdot)$ 是标准正态分布 CDF。</b> $d_1,d_2$ 是它的自变量，依赖标的价格、行权价、利率、波动率、剩余期限。</p>
+    <p><b>$d_2=d_1-\sigma\sqrt{T-t}$：</b> 二者之差是"波动率 × 时间根号"，反映到期前不确定性大小。</p>
+    <p><b>公式特征：</b></p>
+    <ul>
+      <li>不含 $\alpha$（标期望回报率）——这是 BS 的著名特征：期权定价不依赖期望回报，仅靠波动率与无风险利率；</li>
+      <li>$\sigma$ 越大、$T-t$ 越长、$r$ 越高，期权价越高（其他条件不变）；</li>
+      <li>对 $S$ 与 $P$ 的依赖通过对数比 $\ln(S/P)$ 体现，反映"实值/虚值"程度。</li>
+    </ul>
+    <p><b>注意 $d_1$ 含 $+\tfrac12\sigma^2$：</b> 这正是 Itô 校正项的"残迹"——虽然 $\alpha$ 被消掉了，但波动率仍通过这个校正项进入定价。</p>
+  </div>
+</section>
+
+<!-- P45 -->
+<section class="page-card" id="p45">
+  <div class="page-head"><span class="page-num">P45</span><h2 class="page-title">10.4.2 布朗运动的一般解</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Consider the linear SDE</p>
+    <div class="eq">$$ dx(t)=\{a(t)x(t)+b(t)\}\,dt+\sum_{i=1}^m\{c_i(t)x(t)+g_i(t)\}\,dz_i(t). \quad (10.4.5) $$</div>
+    <p>With $x(0)=x_0$, the solution is $x(t)=e^{y(t)}\varphi(t). \quad (10.4.6)$</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>考虑线性 SDE</p>
+    <div class="eq">$$ dx=\{a(t)x+b(t)\}\,dt+\sum_i\{c_i(t)x+g_i(t)\}\,dz_i. \quad (10.4.5) $$</div>
+    <p>初值 $x(0)=x_0$ 下，解为 $x(t)=e^{y(t)}\varphi(t). \quad (10.4.6)$</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>线性 SDE 的形式：</b> 漂移与扩散系数都<b>线性</b>依赖于 $x$。这是最广泛的可解 SDE 类，涵盖几何布朗、Ornstein-Uhlenbeck 等多种特例。</p>
+    <p><b>解的结构 $x=e^y\varphi$：</b> 类比 ODE 的"齐次解 + 特解"分离。$e^{y(t)}$ 是齐次部分的解（不含 $b,g_i$），$\varphi(t)$ 是由非齐次项 $b,g_i$ 累积贡献的部分。下页给出 $y,\varphi$ 的显式表达。</p>
+    <p><b>验证方法（后两页）：</b> 对 $F(y,\varphi)=e^y\varphi$ 用二元 Itô 引理，求 $dx$，再代入 $y,\varphi$ 的 SDE，看是否还原为 (10.4.5)。这是 SDE 解的标准验证流程。</p>
+  </div>
+</section>
+
+<!-- P46 -->
+<section class="page-card" id="p46">
+  <div class="page-head"><span class="page-num">P46</span><h2 class="page-title">10.4.2 一般解：分量</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ y(t)=\int_0^t\!\left\{a(u)-\tfrac12\Psi(u)\right\}du+\sum_{i=1}^m\int_0^t c_i(u)\,dz_i(u), \quad (10.4.7a) $$</div>
+    <div class="eq">$$ \varphi(t)=x_0+\int_0^t e^{-y(s)}\{b(s)-\Phi(s)\}\,ds+\sum_{i=1}^m\int_0^t e^{-y(s)}g_i(s)\,dz_i(s), \quad (10.4.7b) $$</div>
+    <div class="eq">$$ \Psi(s)=\sum_{i,j}\rho_{ij}c_i(s)c_j(s),\quad \Phi(s)=\sum_{i,j}\rho_{ij}c_i(s)g_j(s). \quad (10.4.7c-d) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ y(t)=\int_0^t\!\left(a-\tfrac12\Psi\right)du+\sum_i\int_0^t c_i\,dz_i, \quad (10.4.7a) $$</div>
+    <div class="eq">$$ \varphi(t)=x_0+\int_0^t e^{-y}\{b-\Phi\}\,ds+\sum_i\int_0^t e^{-y}g_i\,dz_i, \quad (10.4.7b) $$</div>
+    <div class="eq">$$ \Psi=\sum_{i,j}\rho_{ij}c_i c_j,\quad \Phi=\sum_{i,j}\rho_{ij}c_i g_j. \quad (10.4.7c-d) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$\Psi$ = 总方差率：</b> $\sum_{i,j}\rho_{ij}c_i c_j$ 是所有 $c_i$ 的加权和（按相关系数）。它衡量齐次部分 $e^y$ 的总瞬时方差率。</p>
+    <p><b>$-\tfrac12\Psi$ 是 Itô 校正：</b> $y$ 中漂移是 $a-\tfrac12\Psi$，比 $a$ 少 $\tfrac12\Psi$。这是为了避免 $e^y$ 的二阶项重复计入——Itô 引理对 $e^y$ 会再加 $\tfrac12\Psi$，最终 $x$ 漂移为 $a$。这与 P40 几何布朗的 $-\tfrac12\sigma^2$ 同构。</p>
+    <p><b>$\Phi$ = 交叉协方差：</b> $\sum\rho_{ij}c_i g_j$ 度量"齐次波动 $c_i$" 与 "非齐次波动 $g_j$" 的相关性。它进入 $\varphi$ 的漂移（$b-\Phi$），代表"波动率交叉对均值的修正"。</p>
+    <p><b>下两页用二元 Itô 验证此解。</b></p>
+  </div>
+</section>
+
+<!-- P47 -->
+<section class="page-card" id="p47">
+  <div class="page-head"><span class="page-num">P47</span><h2 class="page-title">10.4.2 一般解：验证设定</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Write the proposed solution as a function of two stochastic processes:</p>
+    <div class="eq">$$ x(t)=e^{y(t)}\varphi(t)\equiv f(y(t),\varphi(t)). \quad (10.4.8) $$</div>
+    <div class="eq">$$ dy(t)=\left\{a(t)-\tfrac12\Psi(t)\right\}dt+\sum_{i=1}^m c_i(t)\,dz_i(t), \quad (10.4.9a) $$</div>
+    <div class="eq">$$ d\varphi(t)=e^{-y(t)}\{b(t)-\Phi(t)\}\,dt+\sum_{i=1}^m e^{-y(t)}g_i(t)\,dz_i(t). \quad (10.4.9b) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>把候选解写成两随机过程的函数：</p>
+    <div class="eq">$$ x=e^{y}\varphi\equiv f(y,\varphi). \quad (10.4.8) $$</div>
+    <div class="eq">$$ dy=\{a-\tfrac12\Psi\}\,dt+\sum_i c_i\,dz_i, \quad (10.4.9a) $$</div>
+    <div class="eq">$$ d\varphi=e^{-y}\{b-\Phi\}\,dt+\sum_i e^{-y}g_i\,dz_i. \quad (10.4.9b) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>把 $x$ 看作 $(y,\varphi)$ 的二元函数 $f=e^y\varphi$：</b> 应用二元 Itô 公式 (10.2.6)。需要计算 $(dy)^2$、$dy\,d\varphi$、$(d\varphi)^2$，下页给出。</p>
+    <p><b>关键简化：$(d\varphi)^2=0$。</b> 因 $d\varphi$ 中 $dz$ 系数含 $e^{-y}$，量级 $O(1)$；但 $(d\varphi)^2$ 中 $(e^{-y})^2\sum g_i g_j dz_i dz_j=O(dt)$，相对 $dy\,d\varphi$ 也是 $O(dt)$，但后面会看到它被吸收进总项。</p>
+    <p><b>$dy$ 中已含 $-\tfrac12\Psi$ 校正，避免重复计入：</b> 这正是为了让最终 $dx$ 漂移干净还原为 $a$。</p>
+  </div>
+</section>
+
+<!-- P48 -->
+<section class="page-card" id="p48">
+  <div class="page-head"><span class="page-num">P48</span><h2 class="page-title">10.4.2 一般解：Itô 步骤</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ dx(t)=e^{y(t)}\varphi(t)\,dy(t)+e^{y(t)}\,d\varphi(t)+\tfrac12 e^{y(t)}\varphi(t)[dy]^2+2e^{y(t)}[dy\,d\varphi]+0[(d\varphi)^2]. \quad (10.4.10) $$</div>
+    <div class="eq">$$ [dy]^2=\sum_{i,j}\rho_{ij}c_i(t)c_j(t)\,dt. \quad (10.4.11) $$</div>
+    <div class="eq">$$ dy\,d\varphi=e^{-y(t)}\sum_{i,j}\rho_{ij}c_i(t)g_j(t)\,dt. \quad (10.4.12) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ dx=e^y\varphi\,dy+e^y\,d\varphi+\tfrac12 e^y\varphi[dy]^2+2e^y[dy\,d\varphi]+0[(d\varphi)^2]. \quad (10.4.10) $$</div>
+    <div class="eq">$$ [dy]^2=\sum_{i,j}\rho_{ij}c_i c_j\,dt. \quad (10.4.11) $$</div>
+    <div class="eq">$$ dy\,d\varphi=e^{-y}\sum_{i,j}\rho_{ij}c_i g_j\,dt. \quad (10.4.12) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>对 $f=e^y\varphi$ 用二元 Itô：</b> 偏导：$f_y=e^y\varphi=x$，$f_\varphi=e^y$，$f_{yy}=e^y\varphi=x$，$f_{y\varphi}=e^y$，$f_{\varphi\varphi}=0$。代入 (10.2.6) 即得 (10.4.10)。</p>
+    <p><b>$[dy]^2$：</b> 把 $dy$ 中 $dz$ 部分平方，按乘法表 $dz_i dz_j=\rho_{ij}dt$，得 $\sum\rho_{ij}c_ic_j\,dt=\Psi\,dt$。</p>
+    <p><b>$dy\,d\varphi$：</b> $dy$ 的 $dz$ 部分 $\sum c_i dz_i$ 与 $d\varphi$ 的 $dz$ 部分 $e^{-y}\sum g_j dz_j$ 相乘，得 $e^{-y}\sum\rho_{ij}c_i g_j\,dt=e^{-y}\Phi\,dt$。$dt$ 项贡献为 $dt\cdot dz=0$。</p>
+    <p><b>代入简化：$dx=e^y\varphi\,dy+e^y\,d\varphi+\tfrac12 e^y\varphi\Psi\,dt+2e^y e^{-y}\Phi\,dt=x\,dy+e^y\,d\varphi+\tfrac12 x\Psi\,dt+2\Phi\,dt$。</b> 下页代入 $dy,d\varphi$ 表达式，化简。</p>
+  </div>
+</section>
+
+<!-- P49 -->
+<section class="page-card" id="p49">
+  <div class="page-head"><span class="page-num">P49</span><h2 class="page-title">10.4.2 一般解：还原原 SDE</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Substitution into Ito's formula gives</p>
+    <div class="eq">$$ dx(t)=\{x(t)a(t)+b(t)\}\,dt+\sum_{i=1}^m\{x(t)c_i(t)+g_i(t)\}\,dz_i(t) $$</div>
+    <div class="eq">$$ -\tfrac12\{2x(t)\Psi(t)+\Phi(t)\}\,dt+\left\{\sum_{i,j}\rho_{ij}c_ic_j+\sum_{i,j}\rho_{ij}c_i g_j\right\}\,dt. $$</div>
+    <div class="eq">$$ \Rightarrow\;dx(t)=\{x(t)a(t)+b(t)\}\,dt+\sum_{i=1}^m\{x(t)c_i(t)+g_i(t)\}\,dz_i(t). $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>代入 Itô 公式得</p>
+    <div class="eq">$$ dx=\{xa+b\}\,dt+\sum_i\{xc_i+g_i\}\,dz_i $$</div>
+    <div class="eq">$$ -\left\{2x\Psi+\Phi\right\}\cdot\tfrac12\,dt+\left\{\sum_{i,j}\rho_{ij}c_ic_j+\sum_{i,j}\rho_{ij}c_i g_j\right\}\,dt. $$</div>
+    <div class="eq">$$ \Rightarrow\;dx=\{xa+b\}\,dt+\sum_i\{xc_i+g_i\}\,dz_i. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>核心是"校正项抵消"：</b> 代入 $dy=\{a-\tfrac12\Psi\}dt+\sum c_i dz_i$、$d\varphi=e^{-y}\{b-\Phi\}dt+\sum e^{-y}g_i dz_i$ 后：</p>
+    <ul>
+      <li>$x\,dy$ 贡献漂移 $x(a-\tfrac12\Psi)$ + 扩散 $x\sum c_i dz_i$；</li>
+      <li>$e^y\,d\varphi$ 贡献漂移 $b-\Phi$ + 扩散 $\sum g_i dz_i$；</li>
+      <li>Itô 校正项 $\tfrac12 x\Psi+2\Phi$（来自 P48 化简）；</li>
+      <li>合并：漂移 $xa-\tfrac12 x\Psi+b-\Phi+\tfrac12 x\Psi+2\Phi=xa+b+\Phi$，扩散 $x\sum c_i+\sum g_i$。</li>
+  </ul>
+    <p><b>原文写法略有简化：</b> 实际化简后多余的 $\Phi$ 应在更细代入下抵消（$2\Phi-\Phi-\Phi=0$），最终只剩 $xa+b$。结论：候选解 $x=e^y\varphi$ 还原为 (10.4.5)，验证成立。</p>
+    <p><b>意义：</b> 这是连续时间 SDE 的"通解公式"，几乎所有线性 SDE 都可套用。是金融、宏观建模的基石工具。</p>
+  </div>
+</section>
+
+<!-- P50 -->
+<section class="page-card" id="p50">
+  <div class="page-head"><span class="page-num">P50</span><h2 class="page-title">10.4.3 泊松过程的微分方程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A geometric Poisson process for TFP is</p>
+    <div class="eq">$$ \frac{dA(t)}{A(t)}=g\,dt+\sigma\,dq(t),\quad \sigma>-1. \quad (10.4.13) $$</div>
+    <p>Its solution is</p>
+    <div class="eq">$$ A(t)=A_0 e^{gt+[q(t)-q(0)]\ln(1+\sigma)}. \quad (10.4.14) $$</div>
+    <p>Unlike geometric Brownian motion, uncertainty does not enter the deterministic part.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>TFP 的几何泊松过程</p>
+    <div class="eq">$$ \frac{dA}{A}=g\,dt+\sigma\,dq(t),\quad \sigma>-1. \quad (10.4.13) $$</div>
+    <p>解为</p>
+    <div class="eq">$$ A(t)=A_0 e^{gt+[q(t)-q(0)]\ln(1+\sigma)}. \quad (10.4.14) $$</div>
+    <p>与几何布朗不同，不确定性不进入确定性部分。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>关键差别（vs 几何布朗）：</b> 几何布朗的解是 $A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}$，含 Itô 校正 $-\tfrac12\sigma^2$；几何泊松的解是 $A_0 e^{gt+q(t)\ln(1+\sigma)}$，<b>无任何校正项</b>。</p>
+    <p><b>为什么无校正？</b> 因泊松跳跃是"有限大"，用 CVF 时跳跃项是 $F(x+\text{jump})-F(x)$（差分），不涉及二阶导数；对 $F(x)=A_0 e^x$，差分恰好等于"先代数算跳后值，再指数化"。具体说：每次跳跃后 $A\to(1+\sigma)A$，故 $q$ 次跳跃后 $A=A_0(1+\sigma)^q e^{gt}=A_0 e^{gt+q\ln(1+\sigma)}$。</p>
+    <p><b>$\sigma>-1$ 保证 $1+\sigma>0$：</b> 跳跃幅度不至于让 TFP 变负。这是与几何布朗（恒正）的对应条件。</p>
+  </div>
+</section>
+
+<!-- P51 -->
+<section class="page-card" id="p51">
+  <div class="page-head"><span class="page-num">P51</span><h2 class="page-title">10.4.3 泊松微分方程：解与变量代换</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ a(t)=a_0+\int_0^t e^{-y(s)}\Phi(s)\,ds,\quad (10.4.16) $$</div>
+    <div class="eq">$$ y(t)=\int_0^t r(u)\,du+[q(t)-q(0)]\ln(1+\beta). \quad (10.4.17) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ a(t)=a_0+\int_0^t e^{-y(s)}\Phi(s)\,ds, \quad (10.4.16) $$</div>
+    <div class="eq">$$ y(t)=\int_0^t r(u)\,du+[q(t)-q(0)]\ln(1+\beta). \quad (10.4.17) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>背景：把预算约束 $da=\{ra+w-pc\}dt+\beta a\,dq$ 求解。</b> 用类似 (10.4.6) 的"齐次+特解"分解，但此处跳跃源是泊松。</p>
+    <p><b>$y(t)$ 的结构：</b> $y$ 累积了"利率时间积分" $\int r\,du$ 与"跳跃累积" $q(t)\ln(1+\beta)$。后者每次跳跃加 $\ln(1+\beta)$，所以 $q$ 次跳跃后总乘子 $(1+\beta)^q$。</p>
+    <p><b>$a(t)$ 表达式：</b> $a_0$ 是初值；积分项 $\int e^{-y}\Phi\,ds$ 是"现金流（工资-消费）按 $e^{-y}$ 折现到 0 期再加总"。<b>$\Phi(s)$ 应理解为 $w(s)-p(s)c(s)$</b>（净收入流）。</p>
+    <p><b>下页用 CVF 验证：</b> 对 $a(t)=F(y(t),z(t))=e^{y(t)}z(t)$（其中 $z$ 由 $a_0+\int e^{-y}\Phi\,ds$ 定义）应用二元 CVF。</p>
+  </div>
+</section>
+
+<!-- P52 -->
+<section class="page-card" id="p52">
+  <div class="page-head"><span class="page-num">P52</span><h2 class="page-title">10.4.3 泊松微分方程：验证</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Define</p>
+    <div class="eq">$$ z(t)\equiv a_0+\int_0^t e^{-y(s)}\Phi(s)\,ds, \quad (10.4.18) $$</div>
+    <div class="eq">$$ dy(t)=r(t)\,dt+\ln(1+\beta)\,dq(t),\quad dz(t)=e^{-y(t)}\Phi(t)\,dt. \quad (10.4.19) $$</div>
+    <p>Apply the Poisson CVF to $a(t)=F(y(t),z(t))=e^{y(t)}z(t)$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>定义</p>
+    <div class="eq">$$ z(t)\equiv a_0+\int_0^t e^{-y(s)}\Phi(s)\,ds, \quad (10.4.18) $$</div>
+    <div class="eq">$$ dy=r\,dt+\ln(1+\beta)\,dq,\quad dz=e^{-y}\Phi\,dt. \quad (10.4.19) $$</div>
+    <p>对 $a=F(y,z)=e^y z$ 应用泊松 CVF。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>把 $a$ 拆为 $(y,z)$ 的函数：</b> $z$ 是"折现累积净收入"（$dt$ 项，无跳跃），$y$ 是"折现因子"的对数（含跳跃）。$a=e^y z$。</p>
+    <p><b>$dy$ 中跳跃幅度 $\ln(1+\beta)$：</b> 当 $q$ 跳时 $y$ 增加 $\ln(1+\beta)$，故 $e^y$ 乘 $(1+\beta)$——这正是预算约束中"$a\to(1+\beta)a$"的来源。</p>
+    <p><b>$dz$ 只有 $dt$：</b> 因为 $z$ 的定义里只有 $\int\,ds$，无 $\int\,dq$。即净收入流不跳跃（消费、工资在跳跃瞬间不变）。</p>
+    <p><b>下页用 CVF 验证：</b> 对 $F(y,z)=e^y z$ 应用二元 CVF（同引理 10.2.5 因 $y,z$ 共享 $q$），应还原出原预算约束。</p>
+  </div>
+</section>
+
+<!-- P53 -->
+<section class="page-card" id="p53">
+  <div class="page-head"><span class="page-num">P53</span><h2 class="page-title">10.4.3 泊松微分方程：验证（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ dF=F_y r\,dt+F_z e^{-y}\Phi\,dt+\{F(y+\ln(1+\beta),z)-F(y,z)\}\,dq $$</div>
+    <div class="eq">$$ =e^y z r\,dt+e^y e^{-y}\Phi\,dt+\{e^{y+\ln(1+\beta)}z-e^y z\}\,dq $$</div>
+    <div class="eq">$$ =\{r(t)a(t)+\Phi(t)\}\,dt+\beta a(t)\,dq. $$</div>
+    <p>This is the original budget constraint (10.4.15).</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ dF=F_y r\,dt+F_z e^{-y}\Phi\,dt+\{F(y+\ln(1+\beta),z)-F(y,z)\}\,dq $$</div>
+    <div class="eq">$$ =e^y z r\,dt+\Phi\,dt+\{e^{y}(1+\beta)z-e^y z\}\,dq $$</div>
+    <div class="eq">$$ =\{ra+\Phi\}\,dt+\beta a\,dq. $$</div>
+    <p>这就是原预算约束 (10.4.15)。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>验证步骤：</b></p>
+    <ul>
+      <li>$F_y=e^y z=a$、$F_z=e^y$；</li>
+      <li>连续项：$F_y\,dy$ 的 $dt$ 部分 $=e^y z\,r\,dt=ar\,dt$；$F_z\,dz$ 的 $dt$ 部分 $=e^y\cdot e^{-y}\Phi\,dt=\Phi\,dt$；</li>
+      <li>跳跃项：$y\to y+\ln(1+\beta)$，故 $e^y\to e^y(1+\beta)$，差分 $=e^y z\beta=\beta a$；</li>
+      <li>合并：$dF=(ra+\Phi)dt+\beta a\,dq$，即预算约束 $da=\{ra+w-pc\}dt+\beta a\,dq$（$\Phi=w-pc$）。</li>
+    </ul>
+    <p><b>结论：</b> 候选解 (10.4.16)/(10.4.17) 满足原 SDE，验证成立。这给出了连续时间下含泊松跳跃的财富显式解。</p>
+    <p><b>意义：</b> 这种"齐次解+特解"分解对解连续时间动态规划问题极为重要——它把"财富路径"显式化，进而可推出跨期预算约束（下两页）。</p>
+  </div>
+</section>
+
+<!-- P54 -->
+<section class="page-card" id="p54">
+  <div class="page-head"><span class="page-num">P54</span><h2 class="page-title">10.4.3 泊松微分方程：有限期 IBC</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Rewrite the solution as a finite-horizon intertemporal budget constraint.</p>
+    <div class="eq">$$ \int_0^t e^{-y(s)}c(s)\,ds+e^{-y(t)}a(t)=a_0+\int_0^t e^{-y(s)}w(s)\,ds. \quad (10.4.20a) $$</div>
+    <p>Total expenditure equals total wealth in realized terms. Discounting takes place at the realized stochastic interest rate $y(s)$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>把解改写为有限期跨期预算约束。</p>
+    <div class="eq">$$ \int_0^t e^{-y(s)}c(s)\,ds+e^{-y(t)}a(t)=a_0+\int_0^t e^{-y(s)}w(s)\,ds. \quad (10.4.20a) $$</div>
+    <p>在已实现路径上，总支出 = 总财富。按已实现的随机利率 $y(s)$ 折现。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>跨期预算约束（IBC）的含义：</b> 把 (10.4.16) 重排：左边 = 已折现消费累积 + 期末财富折现值；右边 = 期初财富 + 已折现工资累积。等式说"一生消费的现值 + 期末留下资产现值 = 期初资产 + 工资现值"——即"花掉的+留下的=原有的+赚到的"。</p>
+    <p><b>关键点：折现因子 $e^{-y(s)}$ 是<b>随机</b>的：</b> 因 $y(s)=\int_0^s r\,du+q(s)\ln(1+\beta)$，含利率路径与跳跃累积。所以这是"路径实现后"才知的折现因子——是<b>已实现</b>（realized）的折现。</p>
+    <p><b>与离散时间 IBC 类比：</b> 离散时间下 $\sum\beta^t c_t+a_{T+1}=\ldots$ 是期望形式；这里连续时间下是路径实现形式（每条路径都满足），更强。这是因为泊松跳跃是"路径依赖"的，不能简单取期望。</p>
+  </div>
+</section>
+
+<!-- P55 -->
+<section class="page-card" id="p55">
+  <div class="page-head"><span class="page-num">P55</span><h2 class="page-title">10.4.3 泊松微分方程：一般解</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Replace 0 by $t$ and the terminal date by $\tau$.</p>
+    <div class="eq">$$ a(\tau)=e^{y(\tau)}a_t+\int_t^\tau e^{y(\tau)-y(s)}\{w(s)-c(s)\}\,ds, \quad (10.4.21) $$</div>
+    <div class="eq">$$ y(\tau)=\int_t^\tau r(u)\,du+\ln(1+\beta)[q(\tau)-q(t)]. \quad (10.4.22) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>把 0 换成 $t$，末端日期换成 $\tau$。</p>
+    <div class="eq">$$ a(\tau)=e^{y(\tau)}a_t+\int_t^\tau e^{y(\tau)-y(s)}\{w(s)-c(s)\}\,ds. \quad (10.4.21) $$</div>
+    <div class="eq">$$ y(\tau)=\int_t^\tau r(u)\,du+\ln(1+\beta)[q(\tau)-q(t)]. \quad (10.4.22) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>把解推广到任意 $[t,\tau]$ 区间：</b> 从任意时刻 $t$（持资 $a_t$）到 $\tau$ 的财富演化解。结构相同：终值 = 初值的本息 $e^{y(\tau)}a_t$ + 区间内净收入流的终值累积 $\int e^{y(\tau)-y(s)}(w-c)ds$。</p>
+    <p><b>$e^{y(\tau)-y(s)}$ 的意义：</b> 从 $s$ 到 $\tau$ 的"复利因子"——把 $s$ 期的 1 元带到 $\tau$ 期值多少钱。它是 $s$ 时段已实现利率与跳跃的乘积。</p>
+    <p><b>$y(\tau)$ 的两项：</b> 利率累积 $\int r\,du$（连续部分） + 跳跃累积 $\ln(1+\beta)[q(\tau)-q(t)]$（每次跳乘 $\ln(1+\beta)$）。所以 $e^{y(\tau)}=e^{\int r\,du}(1+\beta)^{q(\tau)-q(t)}$。</p>
+  </div>
+</section>
+
+<!-- P56 -->
+<section class="page-card" id="p56">
+  <div class="page-head"><span class="page-num">P56</span><h2 class="page-title">10.4.3 泊松微分方程：无限期 IBC</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Multiply by $e^{-y(\tau)}$ and rearrange:</p>
+    <div class="eq">$$ a(\tau)e^{-y(\tau)}+\int_t^\tau e^{-y(s)}\{c(s)-w(s)\}\,ds=a(t). $$</div>
+    <p>With the no-Ponzi condition $\lim_{\tau\to\infty}a(\tau)e^{-y(\tau)}=0$,</p>
+    <div class="eq">$$ \int_t^\infty e^{-y(s)}c(s)\,ds=a(t)+\int_t^\infty e^{-y(s)}w(s)\,ds. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>两边乘 $e^{-y(\tau)}$ 整理：</p>
+    <div class="eq">$$ a(\tau)e^{-y(\tau)}+\int_t^\tau e^{-y(s)}\{c(s)-w(s)\}\,ds=a(t). $$</div>
+    <p>加 no-Ponzi 条件 $\lim_{\tau\to\infty}a(\tau)e^{-y(\tau)}=0$，得</p>
+    <div class="eq">$$ \int_t^\infty e^{-y(s)}c(s)\,ds=a(t)+\int_t^\infty e^{-y(s)}w(s)\,ds. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>同 P54 IBC，但取 $\tau\to\infty$：</b> 得到无限期跨期预算约束：一生消费现值 = 期初财富 + 工资现值。</p>
+    <p><b>No-Ponzi 条件（NPC）：</b> $\lim a(\tau)e^{-y(\tau)}=0$ 表示终值（按已实现折现因子）趋于 0。这禁止"无限滚动债务"——不能靠永不还债来融资消费。这是连续时间版的横截性条件。</p>
+    <p><b>NPC 的本质：</b> 类似离散时间 TVCl，但更强——要求<b>每条已实现路径</b>的终值为 0，而非仅在期望意义下。这是泊松框架下的合理约束，因每条路径都满足 IBC。</p>
+    <p><b>用法：</b> 把家庭问题转化为"在 IBC 约束下最大化效用"——这是连续时间动态规划的标准形式，可类比离散时间章节的方法求解。</p>
+  </div>
+</section>
+
+<!-- P57 -->
+<section class="page-card" id="p57">
+  <div class="page-head"><span class="page-num">P57</span><h2 class="page-title">10.4.3 泊松微分方程：开关过程</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>A simple switch process solves</p>
+    <div class="eq">$$ dx(t)=-2x(t)\,dq(t),\quad x(0)=x_0. $$</div>
+    <div class="eq">$$ x(t)=(-1)^{q(t)}x_0. $$</div>
+    <p>Under the transformation $y=\bar y+x$,</p>
+    <div class="eq">$$ dy=-2(y-\bar y)\,dq,\quad y_0=\bar y+x_0, $$</div>
+    <div class="eq">$$ y(t)=\bar y+(-1)^{q(t)}x_0. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>一个简单开关过程求解</p>
+    <div class="eq">$$ dx(t)=-2x(t)\,dq(t),\quad x(0)=x_0. $$</div>
+    <div class="eq">$$ x(t)=(-1)^{q(t)}x_0. $$</div>
+    <p>在变换 $y=\bar y+x$ 下，</p>
+    <div class="eq">$$ dy=-2(y-\bar y)\,dq,\quad y_0=\bar y+x_0, $$</div>
+    <div class="eq">$$ y(t)=\bar y+(-1)^{q(t)}x_0. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"开关"（switch）过程：</b> 每次 $q$ 跳时，$x$ 被乘以 $-1$（因 $-2x$ 的跳跃使 $x\to x-2x=-x$）。故 $q$ 次跳跃后 $x=(-1)^q x_0$——在 $+x_0$ 与 $-x_0$ 间来回切换。</p>
+    <p><b>$-2x$ 的来源：</b> 由 SDE $dx=-2x\,dq$，跳后 $\tilde x-x=-2x$，故 $\tilde x=-x$。这是"乘 $-1$"的差分实现。</p>
+    <p><b>变量代换 $y=\bar y+x$：</b> 若关心 $y$ 在常数 $\bar y$ 附近开关，可平移得到同结构 SDE。这是处理"在两点间跳跃"的标准技巧——可用于政权更替、市场状态切换（regime switching）等建模。</p>
+  </div>
+</section>
+
+<!-- P58 -->
+<section class="page-card" id="p58">
+  <div class="page-head"><span class="page-num">P58</span><h2 class="page-title">10.5.1 思路</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For any future date $\tau$, $X(\tau)$ can be treated as a random variable. Understanding a stochastic process means understanding the evolution of its distributional properties. The section computes means and moments of $X(\tau)$ using SDEs, solutions, and martingales.</p>
+    <div class="eq">$$ X(\tau)\;\leadsto\;\text{mean, variance, distribution at future date }\tau. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对任意未来日期 $\tau$，$X(\tau)$ 可视为随机变量。理解随机过程就是理解其分布性质的演化。本节用 SDE、解和鞅计算 $X(\tau)$ 的均值与矩。</p>
+    <div class="eq">$$ X(\tau)\;\leadsto\;\text{在 }\tau\text{ 处的均值、方差、分布}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>本章目标：</b> 给定 SDE，求 $X(\tau)$ 的<b>条件均值</b> $\mathbb{E}_t X(\tau)$ 与<b>条件方差</b> $\text{Var}_t X(\tau)$。这是宏观金融中评估"未来分布"的核心问题。</p>
+    <p><b>三种工具：</b></p>
+    <ul>
+      <li><b>SDE 本身：</b> 取期望把 SDE 变成均值 ODE；</li>
+      <li><b>显式解：</b> 若能解出 $X(\tau)=f(\tau,z(\tau),q(\tau))$，可直接对其取期望；</li>
+      <li><b>鞅：</b> 鞅的期望等于当前值，故鞅项可"消去"——这是简化矩计算的关键。</li>
+    </ul>
+    <p><b>为什么关注矩而非分布：</b> 一般 SDE 的转移分布无显式表达，但前二阶矩通常可解析求出。金融中均值-方差框架、CAPM 都只需前二阶矩。</p>
+  </div>
+</section>
+
+<div class="divider-card">P59 是空白分隔页（仅页码 59/81）</div>
+
+<!-- P60 -->
+<section class="page-card" id="p60">
+  <div class="page-head"><span class="page-num">P60</span><h2 class="page-title">10.5.2 简单结果：布朗运动 I</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For Brownian motion $Z(\tau)$, construct $Z(\tau)-Z(t)$. Conditional on information at $t$, increments have mean zero.</p>
+    <div class="eq">$$ \mathbb{E}_t[Z(\tau)-Z(t)]=0,\quad \text{Var}_t[Z(\tau)-Z(t)]=\sigma^2(\tau-t). $$</div>
+    <div class="eq">$$ \mathbb{E}_t Z(\tau)=Z(t),\quad \text{Var}_t Z(\tau)=\sigma^2(\tau-t). $$</div>
+    <div class="eq">$$ \sigma\equiv 1\;\Rightarrow\;\text{Var}_t Z(\tau)=\tau-t. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对布朗 $Z(\tau)$，考虑 $Z(\tau)-Z(t)$。$t$ 期信息下增量均值为零。</p>
+    <div class="eq">$$ \mathbb{E}_t[Z(\tau)-Z(t)]=0,\;\text{Var}_t[Z(\tau)-Z(t)]=\sigma^2(\tau-t). $$</div>
+    <div class="eq">$$ \mathbb{E}_t Z(\tau)=Z(t),\;\text{Var}_t Z(\tau)=\sigma^2(\tau-t). $$</div>
+    <div class="eq">$$ \sigma=1\;\Rightarrow\;\text{Var}_t Z(\tau)=\tau-t. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>条件均值 = 当前值：</b> $\mathbb{E}_t Z(\tau)=Z(t)$，正是鞅的定义。所以<b>布朗运动是鞅</b>。</p>
+    <p><b>方差随时间增长：</b> $\text{Var}_t Z(\tau)=\sigma^2(\tau-t)$，方差与时间差成正比。这是布朗运动的核心特征——不确定性"扩散"。</p>
+    <p><b>标准化 $\sigma=1$：</b> 后文默认单位时间方差为 1，使记号简洁。要恢复任意 $\sigma$，把所有方差乘 $\sigma^2$。</p>
+    <p><b>意义：</b> 已知今天值 $Z(t)$，未来 $Z(\tau)$ 是均值为今天值、方差为 $\sigma^2(\tau-t)$ 的正态分布。这是后续所有布朗过程矩计算的"原料"。</p>
+  </div>
+</section>
+
+<!-- P61 -->
+<section class="page-card" id="p61">
+  <div class="page-head"><span class="page-num">P61</span><h2 class="page-title">10.5.2 简单结果：布朗运动 II</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For geometric Brownian TFP,</p>
+    <div class="eq">$$ A(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_0 A(t)=A_0\mathbb{E}_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}=A_0 e^{(g-\tfrac12\sigma^2)t}\mathbb{E}_0 e^{\sigma z(t)}. \quad (10.5.1) $$</div>
+    <div class="eq">$$ z(t)\sim N(0,t)\;\Rightarrow\;\mathbb{E}_0 e^{\sigma z(t)}=e^{\tfrac12\sigma^2 t}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对几何布朗 TFP，</p>
+    <div class="eq">$$ A(t)=A_0 e^{(g-\tfrac12\sigma^2)t+\sigma z(t)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_0 A(t)=A_0 e^{(g-\tfrac12\sigma^2)t}\mathbb{E}_0 e^{\sigma z(t)}. \quad (10.5.1) $$</div>
+    <div class="eq">$$ z(t)\sim N(0,t)\;\Rightarrow\;\mathbb{E}_0 e^{\sigma z(t)}=e^{\tfrac12\sigma^2 t}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>关键技巧：正态随机变量的指数期望。</b> 若 $X\sim N(0,\sigma^2)$，则 $\mathbb{E}e^X=e^{\tfrac12\sigma^2}$（矩生成函数 MGF）。此处 $z(t)\sim N(0,t)$，故 $\mathbb{E}e^{\sigma z(t)}=e^{\tfrac12\sigma^2 t}$。</p>
+    <p><b>把 $A_0$ 与已知量提出期望号：</b> $A_0$ 与 $e^{(g-\tfrac12\sigma^2)t}$ 在 0 期已知，是常数，可提出。剩下只需算 $\mathbb{E}_0 e^{\sigma z(t)}$。</p>
+    <p><b>下页合并：</b> $(g-\tfrac12\sigma^2)t+\tfrac12\sigma^2 t=gt$，所以 $\mathbb{E}_0 A(t)=A_0 e^{gt}$。这印证 P40 的结论："$g$ 是 TFP 的期望增长率"——尽管 SDE 中漂移系数也是 $g$，与几何布朗巧合一致。</p>
+  </div>
+</section>
+
+<!-- P62 -->
+<section class="page-card" id="p62">
+  <div class="page-head"><span class="page-num">P62</span><h2 class="page-title">10.5.2 简单结果：布朗运动 II（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <div class="eq">$$ \mathbb{E}_0 A(t)=A_0 e^{(g-\tfrac12\sigma^2)t}e^{\tfrac12\sigma^2 t}=A_0 e^{gt}. \quad (10.5.2) $$</div>
+    <p>Expected TFP grows at the drift rate $g$. The variance parameter $\sigma$ does not affect expected growth.</p>
+    <div class="eq">$$ \text{Var}_0 A(t)=\text{Var}_0\!\left[A_0 e^{(g-\tfrac12\sigma^2)t}e^{\sigma z(t)}\right]=A_0^2 e^{2(g-\tfrac12\sigma^2)t}\text{Var}_0(e^{\sigma z(t)})=A_0^2 e^{2gt}\{e^{\sigma^2 t}-1\}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <div class="eq">$$ \mathbb{E}_0 A(t)=A_0 e^{gt}. \quad (10.5.2) $$</div>
+    <p>TFP 期望以漂移率 $g$ 增长。方差参数 $\sigma$ 不影响期望增长。</p>
+    <div class="eq">$$ \text{Var}_0 A(t)=A_0^2 e^{2gt}\{e^{\sigma^2 t}-1\}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>Itô 校正 $-\tfrac12\sigma^2$ 与 MGF 校正 $+\tfrac12\sigma^2$ 恰好抵消，所以 $\mathbb{E}_0 A(t)=A_0 e^{gt}$：</b> 这是几何布朗的标志性结论——期望增长率就是 SDE 中的漂移率 $g$。也是为什么金融中说"股价对数回报漂移率 $g-\tfrac12\sigma^2$ 但期望回报率是 $g$"。</p>
+    <p><b>$\sigma$ 不影响期望但影响方差：</b> 方差 $\propto e^{\sigma^2 t}-1$，$\sigma$ 越大不确定性越大。这正是"波动率只影响风险溢价、不影响期望回报"（在 BS 框架下）的根源。</p>
+    <p><b>方差公式推导：</b> $\text{Var}(e^{\sigma z})=\mathbb{E}(e^{2\sigma z})-(\mathbb{E}e^{\sigma z})^2=e^{2\sigma^2 t}-e^{\sigma^2 t}=e^{\sigma^2 t}(e^{\sigma^2 t}-1)$。整理即得。</p>
+  </div>
+</section>
+
+<!-- P63 -->
+<section class="page-card" id="p63">
+  <div class="page-head"><span class="page-num">P63</span><h2 class="page-title">10.5.2 简单结果：泊松过程 I</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For a Poisson process with arrival rate $\lambda$,</p>
+    <div class="eq">$$ \mathbb{E}_t q(\tau)=q(t)+\lambda(\tau-t),\quad \tau>t, \quad (10.5.3) $$</div>
+    <div class="eq">$$ \text{Var}_t q(\tau)=\lambda(\tau-t). $$</div>
+    <p>The mean and variance coincide because the increment is Poisson distributed.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对到达率 $\lambda$ 的泊松过程，</p>
+    <div class="eq">$$ \mathbb{E}_t q(\tau)=q(t)+\lambda(\tau-t),\;\tau>t, \quad (10.5.3) $$</div>
+    <div class="eq">$$ \text{Var}_t q(\tau)=\lambda(\tau-t). $$</div>
+    <p>均值与方差相等，因增量服从泊松分布。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>泊松分布的特性：</b> 若 $X\sim\text{Poisson}(\mu)$，则 $\mathbb{E}X=\text{Var}X=\mu$。这是泊松区别于正态的关键——其方差与均值相同，由参数 $\lambda(\tau-t)$ 同时决定。</p>
+    <p><b>$\mathbb{E}_t q(\tau)=q(t)+\lambda(\tau-t)$：</b> 已知 $t$ 期 $q(t)$，未来 $\tau$ 期期望跳跃次数就是 $\lambda(\tau-t)$（单位时间平均 $\lambda$ 次）。这是鞅性失败的体现——泊松过程<b>不是鞅</b>，因漂移 $\lambda$ 不为零。</p>
+    <p><b>对比布朗：</b> 布朗 $\mathbb{E}=\text{当前值}$，$\text{Var}\propto(\tau-t)$；泊松 $\mathbb{E}=\text{当前值}+\lambda(\tau-t)$，$\text{Var}=\lambda(\tau-t)$。两者方差都随时间线性增长，但泊松均值也增长。</p>
+  </div>
+</section>
+
+<!-- P64 -->
+<section class="page-card" id="p64">
+  <div class="page-head"><span class="page-num">P64</span><h2 class="page-title">10.5.2 简单结果：泊松过程 II</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>The probability of exactly one jump between $t$ and $\tau$ is</p>
+    <div class="eq">$$ P[q(\tau)=q(t)+1]=e^{-\lambda(\tau-t)}\lambda(\tau-t). $$</div>
+    <p>For small $dt$, $P[dq(t)=1]=\lambda dt$, $P[dq(t)=0]=1-\lambda dt$.</p>
+    <p>The waiting time between two jumps is exponentially distributed.</p>
+    <div class="eq">$$ P[q(\tau)>q(t)]=1-e^{-\lambda(\tau-t)},\quad f(\tau-t)=\lambda e^{-\lambda(\tau-t)}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>$t$ 到 $\tau$ 之间恰好一次跳跃的概率为</p>
+    <div class="eq">$$ P[q(\tau)=q(t)+1]=e^{-\lambda(\tau-t)}\lambda(\tau-t). $$</div>
+    <p>对小的 $dt$，$P[dq(t)=1]=\lambda dt$，$P[dq(t)=0]=1-\lambda dt$。</p>
+    <p>两次跳跃之间的等待时间服从指数分布。</p>
+    <div class="eq">$$ P[q(\tau)>q(t)]=1-e^{-\lambda(\tau-t)},\;f(\tau-t)=\lambda e^{-\lambda(\tau-t)}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>跳跃间隔 ∼ 指数分布：</b> 泊松过程两连续跳跃间隔 $W$ 服从 $\text{Exp}(\lambda)$，密度 $\lambda e^{-\lambda w}$。这是泊松过程的等价定义之一。</p>
+    <p><b>"无记忆性"：</b> 指数分布是无记忆的——"已经等了多久"对"还要等多久"的分布无影响。这与泊松"独立增量"性质一致。</p>
+    <p><b>小 $dt$ 近似：</b> $P(\text{跳})=\lambda dt$，$P(\text{不跳})=1-\lambda dt$。这与 P6 一致，是 SDE 演算的基本规则。</p>
+    <p><b>"至少一次跳跃"概率：</b> $P[q(\tau)>q(t)]=1-e^{-\lambda(\tau-t)}$，随 $\tau-t$ 单调增趋于 1——只要等足够久，几乎肯定有跳跃发生。</p>
+  </div>
+</section>
+
+<div class="divider-card">P65 是空白分隔页（仅页码 65/81）</div>
+
+<!-- P66 -->
+<section class="page-card" id="p66">
+  <div class="page-head"><span class="page-num">P66</span><h2 class="page-title">10.5.2 简单结果：泊松过程 III</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For geometric Poisson TFP,</p>
+    <div class="eq">$$ A(\tau)=A_t e^{g(\tau-t)+[q(\tau)-q(t)]\ln(1+\sigma)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A_t e^{g(\tau-t)-q(t)\ln(1+\sigma)}\mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}. \quad (10.5.4) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对几何泊松 TFP，</p>
+    <div class="eq">$$ A(\tau)=A_t e^{g(\tau-t)+[q(\tau)-q(t)]\ln(1+\sigma)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A_t e^{g(\tau-t)-q(t)\ln(1+\sigma)}\mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}. \quad (10.5.4) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>背景回顾：</b> 由 P50，几何泊松 TFP 解为 $A(\tau)=A_t e^{g(\tau-t)+[q(\tau)-q(t)]\ln(1+\sigma)}$（把初值换为 $A_t$、起点换为 $t$）。</p>
+    <p><b>取期望的难点：</b> 不能像几何布朗那样直接套 MGF，因为 $q(\tau)$ 是泊松分布（离散），不是正态。需要专门的引理（下页）。</p>
+    <p><b>分离技巧：</b> 把 $q(\tau)-q(t)$ 拆成 $q(\tau)$ 与 $q(t)$。$q(t)$ 在 $t$ 期已知，可提出；剩下 $\mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}$ 需要计算。下页引理 10.5.1 解决这一问题。</p>
+  </div>
+</section>
+
+<!-- P67 -->
+<section class="page-card" id="p67">
+  <div class="page-head"><span class="page-num">P67</span><h2 class="page-title">10.5.2 简单结果：泊松过程 III（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Lemma 10.5.1</b> If $q(t)$ is known at $t$, then for constants $c,k$, $\mathbb{E}_t(c^{kq(\tau)})=c^{kq(t)}e^{(c^k-1)\lambda(\tau-t)}$, $\tau>t$.</p>
+    <p>Set $c=e$ and $k=\ln(1+\sigma)$:</p>
+    <div class="eq">$$ \mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}=e^{q(t)\ln(1+\sigma)+\sigma\lambda(\tau-t)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A_t e^{(g+\sigma\lambda)(\tau-t)}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>引理 10.5.1</b> 若 $t$ 期 $q(t)$ 已知，对常数 $c,k$，$\mathbb{E}_t(c^{kq(\tau)})=c^{kq(t)}e^{(c^k-1)\lambda(\tau-t)}$。</p>
+    <p>取 $c=e$、$k=\ln(1+\sigma)$：</p>
+    <div class="eq">$$ \mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}=e^{q(t)\ln(1+\sigma)+\sigma\lambda(\tau-t)}. $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A_t e^{(g+\sigma\lambda)(\tau-t)}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>引理 10.5.1 = 泊松版"MGF"：</b> 对泊松随机变量 $Q\sim\text{Poisson}(\mu)$，$\mathbb{E}c^{kQ}=e^{(c^k-1)\mu}$。这是泊松分布的矩生成函数。注意它<b>不</b>形如 $e^{\tfrac12\sigma^2\mu}$（那是正态的）。</p>
+    <p><b>代入 $c=e$、$k=\ln(1+\sigma)$：</b> $c^k=e^{\ln(1+\sigma)}=1+\sigma$，$c^k-1=\sigma$。故 $\mathbb{E}_t e^{q(\tau)\ln(1+\sigma)}=e^{q(t)\ln(1+\sigma)+\sigma\lambda(\tau-t)}$。</p>
+    <p><b>最终结果 $\mathbb{E}_t A(\tau)=A_t e^{(g+\sigma\lambda)(\tau-t)}$：</b> <b>期望增长率是 $g+\sigma\lambda$，不是 $g$！</b> 这就是 P12 警告的实现——泊松情形下，漂移 $g$ 不是期望增长率，必须加 $\sigma\lambda$（每次跳跃平均贡献 $\sigma$，单位时间跳 $\lambda$ 次）。这是与几何布朗的关键差别。</p>
+  </div>
+</section>
+
+<!-- P68 -->
+<section class="page-card" id="p68">
+  <div class="page-head"><span class="page-num">P68</span><h2 class="page-title">10.5.2 简单结果：泊松过程 III：证明</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Start from $c^{kq(\tau)}=c^{kq(t)}c^{k[q(\tau)-q(t)]}$.</p>
+    <div class="eq">$$ \mathbb{E}_t c^{k[q(\tau)-q(t)]}=\sum_{n=0}^\infty c^{kn}e^{-\lambda(\tau-t)}\frac{(\lambda(\tau-t))^n}{n!} $$</div>
+    <div class="eq">$$ =e^{(c^k-1)\lambda(\tau-t)}\sum_{n=0}^\infty e^{-c^k\lambda(\tau-t)}\frac{(c^k\lambda(\tau-t))^n}{n!}=e^{(c^k-1)\lambda(\tau-t)}. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>从 $c^{kq(\tau)}=c^{kq(t)}c^{k[q(\tau)-q(t)]}$ 出发。</p>
+    <div class="eq">$$ \mathbb{E}_t c^{k[q(\tau)-q(t)]}=\sum_{n=0}^\infty c^{kn}e^{-\lambda(\tau-t)}\frac{(\lambda(\tau-t))^n}{n!} $$</div>
+    <div class="eq">$$ =e^{(c^k-1)\lambda(\tau-t)}\sum_{n=0}^\infty e^{-c^k\lambda(\tau-t)}\frac{(c^k\lambda(\tau-t))^n}{n!}=e^{(c^k-1)\lambda(\tau-t)}. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>证明思路：</b> $q(\tau)-q(t)\sim\text{Poisson}(\lambda(\tau-t))$，故按泊松分布的 PMF 直接展开 $c^{kn}$ 的期望。</p>
+    <p><b>关键一步——凑指数级数：</b> 把 $c^{kn}=(e^{\ln c^k})^n$ 视作 $a^n$，凑出 $\sum\frac{a^n}{n!}e^{-a}=1$（泊松分布归一化）。具体地：</p>
+    <ul>
+      <li>$\sum c^{kn}\frac{\mu^n}{n!}e^{-\mu}=\sum\frac{(c^k\mu)^n}{n!}e^{-\mu}=e^{c^k\mu}e^{-\mu}=e^{(c^k-1)\mu}$，其中 $\mu=\lambda(\tau-t)$。</li>
+    </ul>
+    <p><b>结果即 $\mathbb{E}_t c^{kq(\tau)}=c^{kq(t)}e^{(c^k-1)\lambda(\tau-t)}$：</b> 这就是引理 10.5.1。$c^{kq(t)}$ 可提出因 $q(t)$ 在 $t$ 已知。</p>
+    <p><b>类比：</b> 这是泊松版本的"$\mathbb{E}e^{\sigma z}=\exp(\tfrac12\sigma^2 t)$"。两者都是"指数化随机变量的期望"，但分布不同（正态 vs 泊松）。</p>
+  </div>
+</section>
+
+<!-- P69 -->
+<section class="page-card" id="p69">
+  <div class="page-head"><span class="page-num">P69</span><h2 class="page-title">10.5.3 鞅</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p><b>Definition 10.5.1</b> A stochastic process $x(t)$ is a martingale if</p>
+    <div class="eq">$$ \mathbb{E}_t x(\tau)=x(t),\;\tau\ge t. \quad (10.5.5) $$</div>
+    <div class="eq">$$ \mathbb{E}_t[x(\tau)-x(t)]=0. $$</div>
+    <p>Brownian motion is a martingale because its expected future increment is zero.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p><b>定义 10.5.1</b> 过程 $x(t)$ 是鞅，若</p>
+    <div class="eq">$$ \mathbb{E}_t x(\tau)=x(t),\;\tau\ge t. \quad (10.5.5) $$</div>
+    <div class="eq">$$ \mathbb{E}_t[x(\tau)-x(t)]=0. $$</div>
+    <p>布朗运动是鞅，因未来增量的期望为零。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>鞅（martingale）的直觉：</b> "明天最可能值 = 今天值"——没有趋势性变化。可理解为"公平游戏"——长期不赚不亏。</p>
+    <p><b>布朗是鞅，泊松不是：</b> 布朗增量期望 0，故 $\mathbb{E}_t z(\tau)=z(t)$；泊松增量期望 $\lambda(\tau-t)\ne 0$，故 $\mathbb{E}_t q(\tau)=q(t)+\lambda(\tau-t)\ne q(t)$。下两页将看到：<b>补偿泊松</b>可造出鞅。</p>
+    <p><b>为什么鞅重要：</b> 在矩计算中，鞅项的"期望贡献"为零，可直接消去。这极大简化计算——这是 10.5.4 的核心技巧。</p>
+  </div>
+</section>
+
+<!-- P70 -->
+<section class="page-card" id="p70">
+  <div class="page-head"><span class="page-num">P70</span><h2 class="page-title">10.5.3 鞅：布朗运动</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For Brownian motion, stochastic integrals of the following form are martingales:</p>
+    <div class="eq">$$ \mathbb{E}_t\int_t^\tau f(z(s),s)\,dz(s)=0. \quad (10.5.6) $$</div>
+    <p>This result is used to eliminate Brownian stochastic integral terms when computing expectations.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对布朗运动，形如下式的随机积分是鞅：</p>
+    <div class="eq">$$ \mathbb{E}_t\int_t^\tau f(z(s),s)\,dz(s)=0. \quad (10.5.6) $$</div>
+    <p>此结果用于在计算期望时消去布朗随机积分项。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>Itô 积分是鞅：</b> 这是 Itô 积分定义的核心性质。直觉上，Itô 积分"不可预测"——每步增量期望为 0，故累积期望也为 0。</p>
+    <p><b>用法：</b> SDE 积分形式 $x(\tau)-x(t)=\int a\,ds+\int b\,dz$。取 $\mathbb{E}_t$ 后，$\int b\,dz$ 这一项直接变 0，剩下 $\mathbb{E}_t x(\tau)-x(t)=\int\mathbb{E}_t a\,ds$。这就是把 SDE 转 ODE 的简化。</p>
+    <p><b>注意条件 $f$ 是"适应"过程：</b> $f(z(s),s)$ 在 $s$ 期已知。Itô 积分定义要求被积函数"不能预见未来"——这保证鞅性。</p>
+  </div>
+</section>
+
+<!-- P71 -->
+<section class="page-card" id="p71">
+  <div class="page-head"><span class="page-num">P71</span><h2 class="page-title">10.5.3 鞅：泊松不确定性</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>For Poisson processes, the compensated process is a martingale.</p>
+    <div class="eq">$$ \mathbb{E}_t\!\left\{\int_t^\tau f(q(s),s)\,dq(s)-\lambda\int_t^\tau f(q(s),s)\,ds\right\}=0. \quad (10.5.7) $$</div>
+    <div class="eq">$$ \Rightarrow\;\mathbb{E}_t\int_t^\tau f\,dq=\lambda\int_t^\tau\mathbb{E}_t f\,ds. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>对泊松过程，补偿过程是鞅。</p>
+    <div class="eq">$$ \mathbb{E}_t\!\left\{\int_t^\tau f\,dq-\lambda\int_t^\tau f\,ds\right\}=0. \quad (10.5.7) $$</div>
+    <div class="eq">$$ \Rightarrow\;\mathbb{E}_t\int_t^\tau f\,dq=\lambda\int_t^\tau\mathbb{E}_t f\,ds. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"补偿泊松" $q-\lambda t$ 是鞅：</b> 因 $\mathbb{E}_t[q(\tau)-\lambda\tau]=q(t)-\lambda t$。把泊松过程的"漂移" $\lambda t$ 减掉，就得到鞅。</p>
+    <p><b>(10.5.7) 公式：</b> 对被积函数 $f$ 而言，$\int f\,dq-\lambda\int f\,ds$ 是鞅，期望为 0。故 $\mathbb{E}_t\int f\,dq=\lambda\int\mathbb{E}_t f\,ds$——把"$dq$"换成"$\lambda ds$"。</p>
+    <p><b>这是泊松版 Itô 鞅性：</b> 布朗有 $\mathbb{E}_t\int f\,dz=0$（把 $dz$ 换成 0）；泊松有 $\mathbb{E}_t\int f\,dq=\lambda\int\mathbb{E}_t f\,ds$（把 $dq$ 换成 $\lambda ds$）。两者都是把"随机积分"转化为"普通积分"，是矩计算的简化核心。</p>
+  </div>
+</section>
+
+<!-- P72 -->
+<section class="page-card" id="p72">
+  <div class="page-head"><span class="page-num">P72</span><h2 class="page-title">10.5.4 计算矩：布朗漂移</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Return to $dx(t)=a\,dt+b\,dz(t)$. Its integral representation is</p>
+    <div class="eq">$$ x(\tau)-x(t)=\int_t^\tau a\,ds+\int_t^\tau b\,dz(s)=a(\tau-t)+b[z(\tau)-z(t)]. \quad (10.5.8) $$</div>
+    <div class="eq">$$ \mathbb{E}_t x(\tau)=x(t)+a(\tau-t)+b\mathbb{E}_t[z(\tau)-z(t)]=x(t)+a(\tau-t). \quad (10.5.9) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>回到 $dx=a\,dt+b\,dz$。其积分表示为</p>
+    <div class="eq">$$ x(\tau)-x(t)=a(\tau-t)+b[z(\tau)-z(t)]. \quad (10.5.8) $$</div>
+    <div class="eq">$$ \mathbb{E}_t x(\tau)=x(t)+a(\tau-t). \quad (10.5.9) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>推导思路：</b> 把 SDE 积分，得 $x(\tau)-x(t)=\int a+\int b\,dz$。取 $\mathbb{E}_t$：因 $a,b$ 为常数可提出，$\mathbb{E}_t\int b\,dz=0$（Itô 鞅），剩下 $a(\tau-t)$。</p>
+    <p><b>结论：均值随时间线性漂移：</b> $\mathbb{E}_t x(\tau)=x(t)+a(\tau-t)$。$a$ 是漂移率——平均单位时间增量为 $a$。</p>
+    <p><b>这印证了直觉：</b> 短期看是噪声，长期看是趋势 $a$。下页算方差。</p>
+  </div>
+</section>
+
+<!-- P73 -->
+<section class="page-card" id="p73">
+  <div class="page-head"><span class="page-num">P73</span><h2 class="page-title">10.5.4 计算矩：布朗方差</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Compute the second moment using (10.5.8):</p>
+    <div class="eq">$$ \mathbb{E}_t x^2(\tau)=\mathbb{E}_t\{[x(t)+a(\tau-t)+b(z(\tau)-z(t))]^2\} \quad (10.5.10) $$</div>
+    <div class="eq">$$ =[x(t)+a(\tau-t)]^2+b^2\mathbb{E}_t\{[z(\tau)-z(t)]^2\}. $$</div>
+    <div class="eq">$$ \text{Var}_t x(\tau)=b^2\text{Var}_t z(\tau)=b^2(\tau-t). $$</div>
+    <p>Thus $a$ is the drift rate and $b^2$ is the variance rate.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>用 (10.5.8) 算二阶矩：</p>
+    <div class="eq">$$ \mathbb{E}_t x^2(\tau)=[x(t)+a(\tau-t)]^2+b^2\mathbb{E}_t\{[z(\tau)-z(t)]^2\}. \quad (10.5.10) $$</div>
+    <div class="eq">$$ \text{Var}_t x(\tau)=b^2(\tau-t). $$</div>
+    <p>故 $a$ 是漂移率，$b^2$ 是方差率。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>展开平方分项：</b> $[x(t)+a(\tau-t)+b\Delta z]^2$ 展开后含三项：常数项平方、交叉项（含 $\Delta z$，期望 0）、$(b\Delta z)^2$。前两项构成 $[x(t)+a(\tau-t)]^2$，最后一项给 $b^2\text{Var}_t\Delta z=b^2(\tau-t)$。</p>
+    <p><b>$\text{Var}_t x(\tau)=b^2(\tau-t)$：</b> 方差率 = $b^2$，与时间 $\tau-t$ 成正比。$b$ 越大方差增长越快。</p>
+    <p><b>总结：线性 SDE 的均值与方差：</b> 均值线性漂移 $a$，方差线性增长 $b^2$。所以 $a$、$b^2$ 才分别叫"漂移率"和"方差率"。</p>
+  </div>
+</section>
+
+<!-- P74 -->
+<section class="page-card" id="p74">
+  <div class="page-head"><span class="page-num">P74</span><h2 class="page-title">10.5.4 计算矩：期望回报，布朗</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>If wealth is allocated across $N$ risky assets,</p>
+    <div class="eq">$$ da(t)=a(t)\!\left\{r\,dt+\sum_{i=1}^N\theta_i\sigma_i\,dz_i(t)\right\},\quad r\equiv\sum_{i=1}^N\theta_i r_i. \quad (10.5.11) $$</div>
+    <p>Since Brownian increments have zero conditional mean, the expected return is $r$. Correlations matter for the variance, through $dz_i dz_j=\rho_{ij}dt$.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>若财富分配到 $N$ 个风险资产，</p>
+    <div class="eq">$$ da=a\!\left\{r\,dt+\sum_i\theta_i\sigma_i\,dz_i\right\},\quad r\equiv\sum_i\theta_i r_i. \quad (10.5.11) $$</div>
+    <p>因布朗增量条件均值为零，期望回报是 $r$。相关性通过 $dz_i dz_j=\rho_{ij}dt$ 影响方差。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>$\theta_i$ 是资产权重，$r_i$ 是资产 $i$ 期望回报：</b> 组合期望回报 $r=\sum\theta_i r_i$ 是加权平均。</p>
+    <p><b>取期望后只剩 $r$：</b> $\mathbb{E}_t da/a=r\,dt$，因 $\mathbb{E}_t dz_i=0$。组合期望回报等于加权平均，与相关性无关。</p>
+    <p><b>相关性影响方差：</b> $\text{Var}_t(da/a)=\sum_{i,j}\theta_i\theta_j\sigma_i\sigma_j\rho_{ij}\,dt$。含 $\rho_{ij}$ 交叉项，所以分散化（持有低相关资产）能降低方差。这是马科维茨组合理论的连续时间版。</p>
+  </div>
+</section>
+
+<!-- P75 -->
+<section class="page-card" id="p75">
+  <div class="page-head"><span class="page-num">P75</span><h2 class="page-title">10.5.4 计算矩：期望回报，泊松</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Start from the Poisson budget constraint</p>
+    <div class="eq">$$ da(t)=\{r(t)a(t)+w(t)-p(t)c(t)\}\,dt+\beta a(t)\,dq(t). $$</div>
+    <p>Define expected return as growth of mean wealth when $w(s)=p(s)c(s)$.</p>
+    <div class="eq">$$ \mathbb{E}_t a(\tau)-a(t)=\int_t^\tau\mathbb{E}_t\{r(s)a(s)+w-pc\}\,ds+\int_t^\tau\mathbb{E}_t\beta a(s)\,dq(s) \quad (10.5.12) $$</div>
+    <div class="eq">$$ =\int_t^\tau\mathbb{E}_t r(s)\mathbb{E}_t a(s)\,ds+\beta\lambda\int_t^\tau\mathbb{E}_t a(s)\,ds. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>从泊松预算约束出发</p>
+    <div class="eq">$$ da=\{ra+w-pc\}\,dt+\beta a\,dq. $$</div>
+    <p>设 $w-pc=0$ 时均值财富的增长率为期望回报。</p>
+    <div class="eq">$$ \mathbb{E}_t a(\tau)-a(t)=\int_t^\tau\mathbb{E}_t\{ra\}\,ds+\beta\lambda\int_t^\tau\mathbb{E}_t a\,ds. \quad (10.5.12) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>取期望的关键技巧：</b> 把 $\int\beta a\,dq$ 用 (10.5.7) 转为 $\lambda\int\beta a\,ds$。这就把"跳跃项期望"换成"普通积分期望"，是泊松矩计算的核心一步。</p>
+    <p><b>设 $w-pc=0$ 的目的：</b> 把消费-工资项消掉，集中分析"纯资产回报"。这是把"期望回报"定义为"无消费/工资时财富均值增长率"。</p>
+    <p><b>注意期望号被拆开：</b> $\mathbb{E}_t\{ra\}=\mathbb{E}_t r\cdot\mathbb{E}_t a$ 需要 $r$ 与 $a$ 在条件期望下独立；若 $r$ 与 $a$ 都依赖同 $q$，这一步需要更小心。原文做了简化。</p>
+  </div>
+</section>
+
+<!-- P76 -->
+<section class="page-card" id="p76">
+  <div class="page-head"><span class="page-num">P76</span><h2 class="page-title">10.5.4 计算矩：泊松（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Define $\mu(s)\equiv\mathbb{E}_t a(s)$.</p>
+    <div class="eq">$$ \mu(\tau)-a(t)=\int_t^\tau\mathbb{E}_t r(s)\mu(s)\,ds+\beta\lambda\int_t^\tau\mu(s)\,ds. $$</div>
+    <div class="eq">$$ \dot\mu(\tau)=\mathbb{E}_t r(\tau)\mu(\tau)+\lambda\beta\mu(\tau),\quad \frac{\dot\mu(\tau)}{\mu(\tau)}=\mathbb{E}_t r(\tau)+\beta\lambda. \quad (10.5.13) $$</div>
+    <p>The Poisson component contributes to the expected return.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>定义 $\mu(s)\equiv\mathbb{E}_t a(s)$。</p>
+    <div class="eq">$$ \mu(\tau)-a(t)=\int_t^\tau\mathbb{E}_t r\,\mu\,ds+\beta\lambda\int_t^\tau\mu\,ds. $$</div>
+    <div class="eq">$$ \dot\mu=\mathbb{E}_t r\,\mu+\lambda\beta\,\mu,\quad \dot\mu/\mu=\mathbb{E}_t r+\beta\lambda. \quad (10.5.13) $$</div>
+    <p>泊松分量对期望回报有贡献。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>把积分方程转 ODE：</b> 对 $\mu(\tau)-a(t)=\int\cdots$ 两边对 $\tau$ 求导，得 $\dot\mu=\mathbb{E}_t r\,\mu+\lambda\beta\,\mu$。这就是均值 $\mu$ 满足的 ODE。</p>
+    <p><b>期望增长率 = $\mathbb{E}_t r+\beta\lambda$：</b> 这是泊松框架的关键结论——<b>期望回报不仅是利率 $r$，还要加跳跃贡献 $\beta\lambda$</b>。每次跳跃按 $\beta$ 比例增长，单位时间平均跳 $\lambda$ 次，故多 $\beta\lambda$。</p>
+    <p><b>对比 P12 的警告：</b> 此处正式推导出"几何泊松的期望增长率 = 漂移 + 跳幅×到达率"。这与 P67 的 $g+\sigma\lambda$ 完全一致。</p>
+  </div>
+</section>
+
+<!-- P77 -->
+<section class="page-card" id="p77">
+  <div class="page-head"><span class="page-num">P77</span><h2 class="page-title">10.5.4 计算矩：期望增长率</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let price follow the geometric Poisson process</p>
+    <div class="eq">$$ dv(\tau)=\alpha v(\tau)\,d\tau+\beta v(\tau)\,dq(\tau). $$</div>
+    <div class="eq">$$ \mathbb{E}_t v(\tau)-v(t)=\alpha\mathbb{E}_t\!\int_t^\tau v\,ds+\beta\mathbb{E}_t\!\int_t^\tau v\,dq. $$</div>
+    <div class="eq">$$ \mu(\tau)-v(t)=\alpha\!\int_t^\tau\mu\,ds+\beta\lambda\!\int_t^\tau\mu\,ds. $$</div>
+    <div class="eq">$$ \dot\mu=(\alpha+\beta\lambda)\mu. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设价格服从几何泊松过程</p>
+    <div class="eq">$$ dv=\alpha v\,d\tau+\beta v\,dq. $$</div>
+    <div class="eq">$$ \mu(\tau)-v(t)=\alpha\!\int\mu\,ds+\beta\lambda\!\int\mu\,ds. $$</div>
+    <div class="eq">$$ \dot\mu=(\alpha+\beta\lambda)\mu. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>这是 P76 的特例：</b> 价格 $v$ 服从几何泊松，期望 $\mu$ 满足 $\dot\mu=(\alpha+\beta\lambda)\mu$，期望增长率 $\alpha+\beta\lambda$。</p>
+    <p><b>结构对照（几何布朗 vs 几何泊松）：</b></p>
+    <ul>
+      <li>几何布朗 $dv/v=\alpha\,dt+\sigma\,dz$：期望增长率 = $\alpha$（不变）；</li>
+      <li>几何泊松 $dv/v=\alpha\,dt+\beta\,dq$：期望增长率 = $\alpha+\beta\lambda$（多了 $\beta\lambda$）。</li>
+    </ul>
+    <p><b>这给出 P67 的另一种推导：</b> 把 $\alpha=g$、$\beta=\sigma$、$\lambda$ 代入，得 $\mathbb{E}_t v(\tau)=v(t)e^{(g+\sigma\lambda)(\tau-t)}$，与 P67 完全一致。</p>
+  </div>
+</section>
+
+<!-- P78 -->
+<section class="page-card" id="p78">
+  <div class="page-head"><span class="page-num">P78</span><h2 class="page-title">10.5.4 计算矩：泊松过程的均值与方差</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Consider</p>
+    <div class="eq">$$ \frac{dv(t)}{v(t)}=\alpha\,dt+\kappa\beta\,dq(t),\;\text{arrival rate }\lambda/\kappa. $$</div>
+    <div class="eq">$$ \mathbb{E}_t v(\tau)=v(t)\exp\{(\alpha+\lambda\beta)(\tau-t)\}. $$</div>
+    <div class="eq">$$ \text{Var}_t v(\tau)=\mathbb{E}_t v(\tau)\left[\exp\{\lambda\kappa\beta^2(\tau-t)\}-1\right]. $$</div>
+    <p>Raising $\kappa$ keeps the mean unchanged but raises the variance.</p>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>考虑</p>
+    <div class="eq">$$ \frac{dv}{v}=\alpha\,dt+\kappa\beta\,dq,\;\text{到达率 }\lambda/\kappa. $$</div>
+    <div class="eq">$$ \mathbb{E}_t v(\tau)=v(t)e^{(\alpha+\lambda\beta)(\tau-t)}. $$</div>
+    <div class="eq">$$ \text{Var}_t v(\tau)=\mathbb{E}_t v(\tau)\left[e^{\lambda\kappa\beta^2(\tau-t)}-1\right]. $$</div>
+    <p>增大 $\kappa$ 保持均值不变但增大方差。</p>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>"频率-幅度"调节：</b> 这里跳幅设为 $\kappa\beta$、到达率设为 $\lambda/\kappa$，所以<b>期望增长率不变</b>：$\kappa\beta\cdot\lambda/\kappa=\beta\lambda$。但方差率 $\propto(\kappa\beta)^2\cdot\lambda/\kappa=\kappa\beta^2\lambda$，随 $\kappa$ 线性增长。</p>
+    <p><b>意义：</b> 可以独立调节"均值增长率"与"方差率"——前者固定后者可调。这给泊松模型提供了灵活性，可校准匹配数据中"高方差低均值"或反之的特征。</p>
+    <p><b>对比几何布朗的局限：</b> 几何布朗的均值与方差都由 $\sigma$ 决定（正相关）。泊松模型打破这一约束，更适合建模"罕见但大冲击"（如危机）——平均影响小但波动大。</p>
+  </div>
+</section>
+
+<!-- P79 -->
+<section class="page-card" id="p79">
+  <div class="page-head"><span class="page-num">P79</span><h2 class="page-title">10.5.4 计算矩：泊松示例</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let TFP follow positive and negative Poisson jumps:</p>
+    <div class="eq">$$ \frac{dA(t)}{A(t)}=\alpha\,dt+\beta_1\,dq_1(t)-\beta_2\,dq_2(t), \quad (10.5.14) $$</div>
+    <p>where $\alpha,\beta_i>0$ and arrival rates are $\lambda_i>0$.</p>
+    <div class="eq">$$ A(\tau)-A(t)=\alpha\!\int_t^\tau A\,ds+\beta_1\!\int_t^\tau A\,dq_1-\beta_2\!\int_t^\tau A\,dq_2. \quad (10.5.15) $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设 TFP 服从正负双向泊松跳跃：</p>
+    <div class="eq">$$ \frac{dA}{A}=\alpha\,dt+\beta_1\,dq_1-\beta_2\,dq_2, \quad (10.5.14) $$</div>
+    <p>其中 $\alpha,\beta_i>0$，到达率 $\lambda_i>0$。</p>
+    <div class="eq">$$ A(\tau)-A(t)=\alpha\!\int A\,ds+\beta_1\!\int A\,dq_1-\beta_2\!\int A\,dq_2. \quad (10.5.15) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>双向泊松模型：</b> $q_1$ 是正向跳跃（技术进步，幅度 $\beta_1$），$q_2$ 是负向跳跃（危机，幅度 $-\beta_2$）。两过程独立，各自有到达率 $\lambda_1,\lambda_2$。</p>
+    <p><b>适用场景：</b> 可同时建模正向技术突破与负向危机冲击，比单一泊松更贴近现实——TFP 既可因创新上升，也可因危机下降。</p>
+    <p><b>积分形式：</b> 把 SDE 积分得 (10.5.15)。下页取期望，用补偿泊松鞅 (10.5.7) 把 $\int A\,dq_i$ 换为 $\lambda_i\int A\,ds$，得 $\mu$ 的 ODE。</p>
+  </div>
+</section>
+
+<!-- P80 -->
+<section class="page-card" id="p80">
+  <div class="page-head"><span class="page-num">P80</span><h2 class="page-title">10.5.4 计算矩：泊松示例（续）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Form expectations and use the compensated-Poisson martingale result.</p>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)-A(t)=\alpha\mathbb{E}_t\!\int_t^\tau A\,ds+\beta_1\mathbb{E}_t\!\int_t^\tau A\,dq_1-\beta_2\mathbb{E}_t\!\int_t^\tau A\,dq_2 \quad (10.5.16) $$</div>
+    <div class="eq">$$ =\alpha\!\int_t^\tau\mathbb{E}_t A\,ds+\beta_1\lambda_1\!\int_t^\tau\mathbb{E}_t A\,ds-\beta_2\lambda_2\!\int_t^\tau\mathbb{E}_t A\,ds. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>取期望并用补偿泊松鞅结果：</p>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)-A(t)=\alpha\!\int\mathbb{E}_t A\,ds+\beta_1\lambda_1\!\int\mathbb{E}_t A\,ds-\beta_2\lambda_2\!\int\mathbb{E}_t A\,ds. \quad (10.5.16) $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>用 (10.5.7)：</b> $\mathbb{E}_t\int A\,dq_i=\lambda_i\int\mathbb{E}_t A\,ds$。注意正负跳跃分别贡献 $+\beta_1\lambda_1$ 与 $-\beta_2\lambda_2$。</p>
+    <p><b>$\alpha$ 项的处理：</b> $\mathbb{E}_t\int\alpha A\,ds=\alpha\int\mathbb{E}_t A\,ds$（$\alpha$ 常数提出）。</p>
+    <p><b>下页给 ODE：</b> 定义 $m_1=\mathbb{E}_t A$，把积分方程对 $\tau$ 求导得 $\dot m_1=(\alpha+\beta_1\lambda_1-\beta_2\lambda_2)m_1$。</p>
+  </div>
+</section>
+
+<!-- P81 -->
+<section class="page-card" id="p81">
+  <div class="page-head"><span class="page-num">P81</span><h2 class="page-title">10.5.4 计算矩：泊松示例（终）</h2></div>
+  <div class="block orig"><span class="tag">原文</span>
+    <p>Let $m_1(\tau)\equiv\mathbb{E}_t A(\tau)$.</p>
+    <div class="eq">$$ m_1(\tau)-A(t)=\alpha\!\int_t^\tau m_1\,ds+\beta_1\lambda_1\!\int_t^\tau m_1\,ds-\beta_2\lambda_2\!\int_t^\tau m_1\,ds. $$</div>
+    <div class="eq">$$ \dot m_1(\tau)=\alpha m_1+\beta_1\lambda_1 m_1-\beta_2\lambda_2 m_1=(\alpha+\beta_1\lambda_1-\beta_2\lambda_2)m_1. \quad (10.5.17) $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A(t)\;\text{ if }\alpha+\beta_1\lambda_1=\beta_2\lambda_2. $$</div>
+  </div>
+  <div class="block trans"><span class="tag">翻译</span>
+    <p>设 $m_1(\tau)\equiv\mathbb{E}_t A(\tau)$。</p>
+    <div class="eq">$$ m_1-A(t)=\alpha\!\int m_1\,ds+\beta_1\lambda_1\!\int m_1\,ds-\beta_2\lambda_2\!\int m_1\,ds. $$</div>
+    <div class="eq">$$ \dot m_1=(\alpha+\beta_1\lambda_1-\beta_2\lambda_2)m_1. \quad (10.5.17) $$</div>
+    <div class="eq">$$ \mathbb{E}_t A(\tau)=A(t)\;\text{若}\;\alpha+\beta_1\lambda_1=\beta_2\lambda_2. $$</div>
+  </div>
+  <div class="block explain"><span class="tag">难点解释</span>
+    <p><b>期望增长率 = $\alpha+\beta_1\lambda_1-\beta_2\lambda_2$：</b> 漂移 $\alpha$ + 正向跳跃期望贡献 $\beta_1\lambda_1$ − 负向跳跃期望贡献 $\beta_2\lambda_2$。这是双向泊松的完整均值动态。</p>
+    <p><b>"均衡增长"条件 $\alpha+\beta_1\lambda_1=\beta_2\lambda_2$：</b> 当正负跳跃期望贡献抵消时，$\mathbb{E}_t A(\tau)=A(t)$——TFP 在期望意义下不变。这可用来建模"无趋势但有波动"的稳态经济。</p>
+    <p><b>本章总结：</b> 通过 Itô 引理与 CVF，我们能从 SDE 出发，取期望得到均值 ODE，从而解析地求出过程的<b>期望路径</b>。这是连续时间宏观金融的核心工具——把"随机动态"转化为"确定性 ODE"再分析。</p>
+  </div>
+</section>
+
+<details class="summary-box">
+  <summary>整章核心要点速览（点击展开）</summary>
+  <p><b>1. 两大随机过程：</b> 布朗运动 $z$（连续、独立增量、鞅）；泊松过程 $q$（跳跃、独立增量、非鞅因 $\mathbb{E}dq=\lambda dt$）。</p>
+  <p><b>2. SDE 三大形式：</b> 线性 $dx=a\,dt+b\,dz$；泊松 $dx=a\,dt+b\,dq$；几何（$dx/x$ 形式）保证恒正。</p>
+  <p><b>3. 随机微积分两大工具：</b> Itô 引理（布朗，含二阶校正 $\tfrac12 F_{xx}b^2$）；CVF（泊松，用差分 $F(x+b)-F(x)$ 替代导数）。</p>
+  <p><b>4. 乘法表：</b> $dz^2=dt$，$dz_i dz_j=\rho_{ij}dt$；泊松跳跃"同时或不"由是否共享 $q$ 决定。</p>
+  <p><b>5. Black-Scholes：</b> 用 Delta 对冲构造无风险组合，无套利推出 BS PDE；解含标准正态 CDF。期权价不依赖 $\alpha$（期望回报），只依赖 $\sigma,r$。</p>
+  <p><b>6. 预算约束：</b> 用 CVF 推 $da=\{ra+w-pc\}dt+\beta a\,dq$；求解得跨期预算约束 $\int e^{-y}c=a+\int e^{-y}w$（路径实现版，含随机折现）。</p>
+  <p><b>7. 解 SDE 的"齐次+特解"：</b> $x=e^y\varphi$，$y$ 累积齐次动态（含 $-\tfrac12\Psi$ Itô 校正），$\varphi$ 累积特解贡献。所有线性 SDE 通用。</p>
+  <p><b>8. 几何过程的关键差别：</b> 几何布朗 $\mathbb{E}A=A_0 e^{gt}$（期望增长率 = 漂移）；几何泊松 $\mathbb{E}A=A_t e^{(g+\sigma\lambda)(\tau-t)}$（期望增长率 = 漂移 + 跳幅×到达率）。</p>
+  <p><b>9. 鞅与矩计算：</b> 布朗 Itô 积分 $\mathbb{E}_t\int f\,dz=0$；补偿泊松 $\mathbb{E}_t\int f\,dq=\lambda\int\mathbb{E}_t f\,ds$。两者都把 SDE 转 ODE。</p>
+  <p><b>10. 双向泊松：</b> $\mathbb{E}A$ 增长率 = $\alpha+\beta_1\lambda_1-\beta_2\lambda_2$，可独立校准均值与方差。</p>
+</details>
+
+<footer>翻译与解释基于原文 PDF（OP_ch10.pdf, 81 页）· 数学公式由 MathJax 渲染 · 仅供学习参考</footer>
+</main>
+</body>
+</html>
