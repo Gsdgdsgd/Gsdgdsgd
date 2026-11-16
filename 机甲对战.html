@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b16">
+  <title>钢核对决｜像素机甲对战</title>
+  <link rel="stylesheet" href="样式.css">
+  <script src="游戏.js" defer></script>
+</head>
+<body>
+  <main class="arcade">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">PIXEL MECHA COMBAT / 01</p>
+        <h1>钢核<span>对决</span></h1>
+      </div>
+      <div class="system-status"><i></i> 本地双人 · 系统在线</div>
+    </header>
+
+    <section class="cabinet" aria-label="钢核对决游戏机">
+      <div class="cabinet-top">
+        <span>ARENA_07 // 废弃都市</span>
+        <span class="signal">■■■□</span>
+      </div>
+      <div class="screen" id="screen">
+        <canvas id="game" width="480" height="270" role="img" aria-label="双人像素机甲对战画面，按回车开始">
+          当前浏览器不支持 Canvas，请使用现代浏览器打开。
+        </canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+      </div>
+      <div class="cabinet-bottom">
+        <span>INSERT COIN</span>
+        <strong><kbd>ENTER</kbd> 开始 / 重开</strong>
+        <span>60 SEC</span>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="玩家操作说明">
+      <article class="player-card player-one">
+        <div class="player-heading">
+          <span class="player-number">01</span>
+          <div><h2>苍蓝·猎隼</h2><p>PLAYER ONE</p></div>
+          <span class="mecha-chip">均衡型</span>
+        </div>
+        <div class="key-row">
+          <div><span class="keys"><kbd>A</kbd><kbd>D</kbd></span><span>移动</span></div>
+          <div><span class="keys"><kbd>W</kbd></span><span>跳跃</span></div>
+          <div><span class="keys attack"><kbd>F</kbd></span><span>光刃</span></div>
+          <div><span class="keys guard"><kbd>G</kbd></span><span>防御</span></div>
+        </div>
+      </article>
+
+      <div class="versus" aria-hidden="true"><span>VS</span><i></i></div>
+
+      <article class="player-card player-two">
+        <div class="player-heading">
+          <span class="player-number">02</span>
+          <div><h2>赤红·重锤</h2><p>PLAYER TWO</p></div>
+          <span class="mecha-chip">均衡型</span>
+        </div>
+        <div class="key-row">
+          <div><span class="keys"><kbd>←</kbd><kbd>→</kbd></span><span>移动</span></div>
+          <div><span class="keys"><kbd>↑</kbd></span><span>跳跃</span></div>
+          <div><span class="keys attack"><kbd>K</kbd></span><span>光刃</span></div>
+          <div><span class="keys guard"><kbd>L</kbd></span><span>防御</span></div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="briefing">
+      <span><b>01</b> 光刃命中 <strong>-10</strong></span>
+      <span><b>02</b> 正面格挡 <strong>-2</strong></span>
+      <span><b>03</b> 击空生命或超时判定胜负</span>
+    </footer>
+  </main>
+  <noscript>请启用 JavaScript 后运行游戏。</noscript>
+</body>
+</html>
